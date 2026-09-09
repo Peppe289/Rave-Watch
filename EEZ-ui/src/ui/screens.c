@@ -108,8 +108,8 @@ void create_screen_main() {
                     // BtnSettings
                     lv_obj_t *obj = lv_obj_create(parent_obj);
                     objects.btn_settings = obj;
-                    lv_obj_set_pos(obj, 10, 240);
-                    lv_obj_set_size(obj, 30, 30);
+                    lv_obj_set_pos(obj, 10, 220);
+                    lv_obj_set_size(obj, 52, 52);
                     lv_obj_set_style_pad_left(obj, 0, LV_PART_MAIN | LV_STATE_DEFAULT);
                     lv_obj_set_style_pad_top(obj, 0, LV_PART_MAIN | LV_STATE_DEFAULT);
                     lv_obj_set_style_pad_right(obj, 0, LV_PART_MAIN | LV_STATE_DEFAULT);
@@ -124,7 +124,7 @@ void create_screen_main() {
                         lv_obj_t *parent_obj = obj;
                         {
                             lv_obj_t *obj = lv_img_create(parent_obj);
-                            lv_obj_set_pos(obj, 3, 3);
+                            lv_obj_set_pos(obj, 14, 14);
                             lv_obj_set_size(obj, LV_SIZE_CONTENT, LV_SIZE_CONTENT);
                             lv_img_set_src(obj, &img_settings_bit_map);
                             lv_obj_clear_flag(obj, LV_OBJ_FLAG_ADV_HITTEST|LV_OBJ_FLAG_CLICK_FOCUSABLE|LV_OBJ_FLAG_SCROLLABLE|LV_OBJ_FLAG_SCROLL_CHAIN_HOR|LV_OBJ_FLAG_SCROLL_CHAIN_VER|LV_OBJ_FLAG_SCROLL_ELASTIC|LV_OBJ_FLAG_SCROLL_MOMENTUM|LV_OBJ_FLAG_SCROLL_WITH_ARROW);
@@ -135,8 +135,8 @@ void create_screen_main() {
                     // BtnAppDrawer
                     lv_obj_t *obj = lv_obj_create(parent_obj);
                     objects.btn_app_drawer = obj;
-                    lv_obj_set_pos(obj, 200, 240);
-                    lv_obj_set_size(obj, 30, 30);
+                    lv_obj_set_pos(obj, 178, 220);
+                    lv_obj_set_size(obj, 52, 52);
                     lv_obj_set_style_pad_left(obj, 0, LV_PART_MAIN | LV_STATE_DEFAULT);
                     lv_obj_set_style_pad_top(obj, 0, LV_PART_MAIN | LV_STATE_DEFAULT);
                     lv_obj_set_style_pad_right(obj, 0, LV_PART_MAIN | LV_STATE_DEFAULT);
@@ -150,7 +150,7 @@ void create_screen_main() {
                         lv_obj_t *parent_obj = obj;
                         {
                             lv_obj_t *obj = lv_img_create(parent_obj);
-                            lv_obj_set_pos(obj, 3, 3);
+                            lv_obj_set_pos(obj, 14, 14);
                             lv_obj_set_size(obj, LV_SIZE_CONTENT, LV_SIZE_CONTENT);
                             lv_img_set_src(obj, &img_grid_view_bit_map);
                         }
@@ -207,8 +207,8 @@ void create_screen_settings_page() {
             // BtnHome
             lv_obj_t *obj = lv_obj_create(parent_obj);
             objects.btn_home = obj;
-            lv_obj_set_pos(obj, 105, 240);
-            lv_obj_set_size(obj, 30, 30);
+            lv_obj_set_pos(obj, 94, 220);
+            lv_obj_set_size(obj, 52, 52);
             lv_obj_set_style_pad_left(obj, 0, LV_PART_MAIN | LV_STATE_DEFAULT);
             lv_obj_set_style_pad_top(obj, 0, LV_PART_MAIN | LV_STATE_DEFAULT);
             lv_obj_set_style_pad_right(obj, 0, LV_PART_MAIN | LV_STATE_DEFAULT);
@@ -222,7 +222,7 @@ void create_screen_settings_page() {
                 lv_obj_t *parent_obj = obj;
                 {
                     lv_obj_t *obj = lv_img_create(parent_obj);
-                    lv_obj_set_pos(obj, 3, 3);
+                    lv_obj_set_pos(obj, 14, 14);
                     lv_obj_set_size(obj, LV_SIZE_CONTENT, LV_SIZE_CONTENT);
                     lv_img_set_src(obj, &img_home_bit_map);
                 }
@@ -253,8 +253,8 @@ void create_screen_drawer_page() {
             // BtnHomeDrawer
             lv_obj_t *obj = lv_obj_create(parent_obj);
             objects.btn_home_drawer = obj;
-            lv_obj_set_pos(obj, 105, 240);
-            lv_obj_set_size(obj, 30, 30);
+            lv_obj_set_pos(obj, 94, 220);
+            lv_obj_set_size(obj, 52, 52);
             lv_obj_set_style_pad_left(obj, 0, LV_PART_MAIN | LV_STATE_DEFAULT);
             lv_obj_set_style_pad_top(obj, 0, LV_PART_MAIN | LV_STATE_DEFAULT);
             lv_obj_set_style_pad_right(obj, 0, LV_PART_MAIN | LV_STATE_DEFAULT);
@@ -268,7 +268,7 @@ void create_screen_drawer_page() {
                 lv_obj_t *parent_obj = obj;
                 {
                     lv_obj_t *obj = lv_img_create(parent_obj);
-                    lv_obj_set_pos(obj, 3, 3);
+                    lv_obj_set_pos(obj, 14, 14);
                     lv_obj_set_size(obj, LV_SIZE_CONTENT, LV_SIZE_CONTENT);
                     lv_img_set_src(obj, &img_home_bit_map);
                 }
