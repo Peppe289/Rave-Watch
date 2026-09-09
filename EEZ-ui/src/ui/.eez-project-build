@@ -1,0 +1,23 @@
+{
+  "files": [
+    "actions.h",
+    "eez-flow-lz4.c",
+    "eez-flow-lz4.h",
+    "eez-flow.cpp",
+    "eez-flow.h",
+    "fonts.h",
+    "images.c",
+    "images.h",
+    "screens.c",
+    "screens.h",
+    "structs.h",
+    "styles.c",
+    "styles.h",
+    "ui.c",
+    "ui.h",
+    "ui_image_grid_view_bit_map.c",
+    "ui_image_home_bit_map.c",
+    "ui_image_settings_bit_map.c",
+    "vars.h"
+  ]
+}

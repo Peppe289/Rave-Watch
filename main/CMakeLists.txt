@@ -1,0 +1,15 @@
+file(GLOB_RECURSE EXTRA_SRCS 
+    "components/ui/*.c"
+    "components/ui/*.cpp"
+    "components/display/*.c"
+    "components/touch/*.c"
+)
+file(GLOB MAIN_SRCS "*.c")
+
+idf_component_register(SRCS ${MAIN_SRCS} ${EXTRA_SRCS}
+                       INCLUDE_DIRS "." "components/ui" "components/touch" "components/display"
+                       PRIV_REQUIRES spi_flash esp_lcd esp_timer driver spiffs lvgl esp_driver_ledc )
+
+set_source_files_properties(components/ui/eez-flow.cpp PROPERTIES
+    COMPILE_FLAGS "-std=gnu++17"
+)

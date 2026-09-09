@@ -1,0 +1,4 @@
+dependencies:
+  lvgl/lvgl: "8.3.11"
+#  eez-framework:
+#    git: https://github.com/eez-open/eez-framework.git
