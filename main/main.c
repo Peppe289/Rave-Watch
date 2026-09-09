@@ -1,18 +1,15 @@
 #include <stdio.h>
-#include <inttypes.h>
-#include <string.h>
 
 #include "sdkconfig.h"
 #include "freertos/FreeRTOS.h"
 #include "freertos/task.h"
 #include "freertos/semphr.h"
-#include "esp_chip_info.h"
-#include "esp_flash.h"
-#include "esp_system.h"
-#include "esp_log.h"
+//#include "esp_chip_info.h"
+//#include "esp_flash.h"
+//#include "esp_system.h"
+//#include "esp_log.h"
 #include "esp_heap_caps.h"
 #include "esp_lcd_panel_io.h"
-#include "esp_lcd_panel_vendor.h"
 #include "esp_lcd_panel_ops.h"
 
 #include "st7789v2.h"

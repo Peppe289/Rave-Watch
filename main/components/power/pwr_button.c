@@ -1,9 +1,6 @@
 #include "pwr_button.h"
 #include "driver/gpio.h"
 
-#define BOARD_SYS_EN_PIN   GPIO_NUM_41
-#define BOARD_SYS_OUT_PIN  GPIO_NUM_40
-
 void board_power_latch(void) {
     gpio_config_t en_conf = {
         .pin_bit_mask = (1ULL << BOARD_SYS_EN_PIN),

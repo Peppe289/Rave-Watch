@@ -3,12 +3,7 @@
 #include "esp_adc/adc_oneshot.h"
 #include "esp_adc/adc_cali.h"
 #include "esp_adc/adc_cali_scheme.h"
-
-
-#define BATTERY_ADC_UNIT       ADC_UNIT_1
-#define BATTERY_ADC_CHANNEL    ADC_CHANNEL_0
-
-#define BATTERY_VOLTAGE_DIVIDER_RATIO 3.07f
+#include "voltage.h"
 
 static adc_oneshot_unit_handle_t adc1_handle = NULL;
 static adc_cali_handle_t adc_cali_handle = NULL;

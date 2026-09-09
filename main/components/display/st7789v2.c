@@ -7,9 +7,6 @@
 
 #include "st7789v2.h"
 
-#define LCD_BL_PWM_TIMER LEDC_TIMER_0
-#define LCD_BL_PWM_CH    LEDC_CHANNEL_0
-
 esp_lcd_panel_handle_t panel_handle = NULL;
 esp_lcd_panel_io_handle_t io_handle = NULL;
 
