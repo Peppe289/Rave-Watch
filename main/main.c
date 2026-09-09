@@ -5,6 +5,7 @@
 #include "sdkconfig.h"
 #include "freertos/FreeRTOS.h"
 #include "freertos/task.h"
+#include "freertos/semphr.h"
 #include "esp_chip_info.h"
 #include "esp_flash.h"
 #include "esp_system.h"
@@ -23,7 +24,7 @@
 
 #define LCD_H_RES 240
 #define LCD_V_RES 280
-#define LVGL_BUF_LINES 40
+#define LVGL_BUF_LINES 140
 #define DISP_BUF_SIZE (LCD_H_RES * LVGL_BUF_LINES)
 
 extern esp_lcd_panel_handle_t panel_handle;
@@ -32,8 +33,10 @@ extern esp_lcd_panel_io_handle_t io_handle;
 static lv_disp_drv_t disp_drv;
 static lv_disp_draw_buf_t disp_buf;
 static lv_color_t *buf1 = NULL;
+static lv_color_t *buf2 = NULL;
 
-// Callback eseguito dall'ISR quando il DMA SPI ha terminato di spedire il blocco
+static SemaphoreHandle_t lvgl_mutex = NULL;
+
 static bool notify_lvgl_flush_ready(esp_lcd_panel_io_handle_t panel_io, 
                                     esp_lcd_panel_io_event_data_t *edata, 
                                     void *user_ctx) {
@@ -52,47 +55,51 @@ static void lvgl_flush_cb(lv_disp_drv_t *drv, const lv_area_t *area, lv_color_t 
         pixels[i] = __builtin_bswap16(pixels[i]);
     }
 
-    // Avvia il trasferimento DMA
     esp_lcd_panel_draw_bitmap(panel_handle, area->x1, area->y1, area->x2 + 1, area->y2 + 1, pixels);
-    // NON chiamare lv_disp_flush_ready qui: aspetta che il DMA finisca
 }
 
-static void lvgl_tick_task(void *arg) {
-    while (1) {
-        vTaskDelay(pdMS_TO_TICKS(10));
-        lv_tick_inc(10);
+static void touch_read_cb(lv_indev_drv_t *indev_drv, lv_indev_data_t *data) {
+    static uint16_t last_x = 0;
+    static uint16_t last_y = 0;
+
+    if (cst816_is_pressed()) {
+        cst816_get_coordinates(&last_x, &last_y);
+        data->point.x = last_x;
+        data->point.y = last_y;
+        data->state = LV_INDEV_STATE_PR;
+    } else {
+        data->point.x = last_x;
+        data->point.y = last_y;
+        data->state = LV_INDEV_STATE_REL;
     }
 }
 
 static void lvgl_handler_task(void *arg) {
     while (1) {
-        lv_timer_handler();
-        ui_tick();
+        lv_tick_inc(10);
+
+        if (xSemaphoreTake(lvgl_mutex, portMAX_DELAY) == pdTRUE) {
+            lv_timer_handler();
+            ui_tick();
+            xSemaphoreGive(lvgl_mutex);
+        }
+
         vTaskDelay(pdMS_TO_TICKS(10));
     }
 }
 
-static void touch_read_cb(lv_indev_drv_t *indev_drv, lv_indev_data_t *data) {
-    uint16_t x = 0;
-    uint16_t y = 0;
-
-    if (cst816_is_pressed()) {
-        cst816_get_coordinates(&x, &y);
-        data->point.x = x;
-        data->point.y = y;
-        data->state = LV_INDEV_STATE_PR;
-    } else {
-        data->state = LV_INDEV_STATE_REL;
-    }
-}
-
 static void battery_task(void *arg) {
+    char voltage_str[16];
+
     while (1) {
         uint32_t voltage_mv = battery_get_voltage_mv();
-        char *voltage_str = (char *)malloc(16);
-        snprintf(voltage_str, 16, "%.2f V", voltage_mv / 1000.0f);
-        set_var_battery_voltage(voltage_str);
-        free(voltage_str);
+        snprintf(voltage_str, sizeof(voltage_str), "%.2f V", voltage_mv / 1000.0f);
+
+        if (xSemaphoreTake(lvgl_mutex, portMAX_DELAY) == pdTRUE) {
+            set_var_battery_voltage(voltage_str);
+            xSemaphoreGive(lvgl_mutex);
+        }
+
         vTaskDelay(pdMS_TO_TICKS(5000));
     }
 }
@@ -104,13 +111,17 @@ void app_main(void)
     touch_init_i2c();
     st7789vw_set_brightness(10);
 
+    lvgl_mutex = xSemaphoreCreateMutex();
+    assert(lvgl_mutex != NULL);
+
     lv_init();
     battery_adc_init();
 
     buf1 = heap_caps_aligned_alloc(4, DISP_BUF_SIZE * sizeof(lv_color_t), MALLOC_CAP_DMA | MALLOC_CAP_INTERNAL);
-    assert(buf1 != NULL);
+    buf2 = heap_caps_aligned_alloc(4, DISP_BUF_SIZE * sizeof(lv_color_t), MALLOC_CAP_DMA | MALLOC_CAP_INTERNAL);
+    assert(buf1 != NULL && buf2 != NULL);
 
-    lv_disp_draw_buf_init(&disp_buf, buf1, NULL, DISP_BUF_SIZE);
+    lv_disp_draw_buf_init(&disp_buf, buf1, buf2, DISP_BUF_SIZE);
 
     lv_disp_drv_init(&disp_drv);
     disp_drv.hor_res = LCD_H_RES;
@@ -125,16 +136,13 @@ void app_main(void)
     indev_drv.read_cb = touch_read_cb;
     lv_indev_drv_register(&indev_drv);
 
-    // Registra il callback di sincronizzazione DMA con LVGL
     const esp_lcd_panel_io_callbacks_t cbs = {
         .on_color_trans_done = notify_lvgl_flush_ready,
     };
     ESP_ERROR_CHECK(esp_lcd_panel_io_register_event_callbacks(io_handle, &cbs, &disp_drv));
 
-    // Carica la UI di EEZ Studio
     ui_init();
 
-    xTaskCreatePinnedToCore(battery_task, "battery_task", 2048, NULL, 5, NULL, 0);
-    xTaskCreatePinnedToCore(lvgl_tick_task, "lvgl_tick", 2048, NULL, 5, NULL, 0);
-    xTaskCreatePinnedToCore(lvgl_handler_task, "lvgl_handler", 8192, NULL, 4, NULL, 1);
+    xTaskCreatePinnedToCore(battery_task, "battery_task", 2048, NULL, 3, NULL, 0);
+    xTaskCreatePinnedToCore(lvgl_handler_task, "lvgl_handler", 8192, NULL, 5, NULL, 1);
 }
