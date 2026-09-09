@@ -18,7 +18,7 @@
 #define LCD_BL_PWM_TIMER LEDC_TIMER_0
 #define LCD_BL_PWM_CH    LEDC_CHANNEL_0
 
-void st7789vw_init_spi();
+esp_err_t st7789vw_init_spi(void);
 void st7789vw_draw_bitmap(int x_start, int y_start, int x_end, int y_end, const void *color_data);
 void st7789vw_draw_full_bitmap(const void *color_data);
 void st7789vw_set_brightness(uint8_t percentage);

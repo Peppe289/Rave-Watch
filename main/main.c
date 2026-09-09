@@ -43,16 +43,7 @@ static bool notify_lvgl_flush_ready(esp_lcd_panel_io_handle_t panel_io,
 }
 
 static void lvgl_flush_cb(lv_disp_drv_t *drv, const lv_area_t *area, lv_color_t *color_map) {
-    uint32_t w = (area->x2 - area->x1 + 1);
-    uint32_t h = (area->y2 - area->y1 + 1);
-    uint32_t len = w * h;
-
-    uint16_t *pixels = (uint16_t *)color_map;
-    for (uint32_t i = 0; i < len; i++) {
-        pixels[i] = __builtin_bswap16(pixels[i]);
-    }
-
-    esp_lcd_panel_draw_bitmap(panel_handle, area->x1, area->y1, area->x2 + 1, area->y2 + 1, pixels);
+    esp_lcd_panel_draw_bitmap(panel_handle, area->x1, area->y1, area->x2 + 1, area->y2 + 1, color_map);
 }
 
 static void touch_read_cb(lv_indev_drv_t *indev_drv, lv_indev_data_t *data) {

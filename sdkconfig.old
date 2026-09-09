@@ -1125,6 +1125,19 @@ CONFIG_EFUSE_MAX_BLK_LEN=256
 # end of eFuse Bit Manager
 
 #
+# ADC and ADC Calibration
+#
+# default:
+# CONFIG_ADC_ONESHOT_CTRL_FUNC_IN_IRAM is not set
+# default:
+# CONFIG_ADC_CONTINUOUS_ISR_IRAM_SAFE is not set
+# default:
+# CONFIG_ADC_CONTINUOUS_FORCE_USE_ADC2_ON_C3_S3 is not set
+# default:
+# CONFIG_ADC_ENABLE_DEBUG_LOG is not set
+# end of ADC and ADC Calibration
+
+#
 # Common ESP-related
 #
 # default:
@@ -1172,6 +1185,13 @@ CONFIG_I2C_MASTER_ISR_HANDLER_IN_IRAM=y
 # default:
 # CONFIG_I2S_ENABLE_DEBUG_LOG is not set
 # end of ESP-Driver:I2S Configurations
+
+#
+# ESP-Driver:LEDC Configurations
+#
+# default:
+# CONFIG_LEDC_CTRL_FUNC_IN_IRAM is not set
+# end of ESP-Driver:LEDC Configurations
 
 #
 # ESP-Driver:SPI Configurations
@@ -2542,7 +2562,8 @@ CONFIG_LV_COLOR_DEPTH_16=y
 # CONFIG_LV_COLOR_DEPTH_1 is not set
 # default:
 CONFIG_LV_COLOR_DEPTH=16
-CONFIG_LV_COLOR_16_SWAP=y
+# default:
+# CONFIG_LV_COLOR_16_SWAP is not set
 # default:
 # CONFIG_LV_COLOR_SCREEN_TRANSP is not set
 # default:
