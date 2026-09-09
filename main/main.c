@@ -1,16 +1,16 @@
 #include <stdio.h>
 
+#include "esp_check.h"
 #include "sdkconfig.h"
 #include "freertos/FreeRTOS.h"
 #include "freertos/task.h"
 #include "freertos/semphr.h"
-//#include "esp_chip_info.h"
-//#include "esp_flash.h"
-//#include "esp_system.h"
-//#include "esp_log.h"
+#include "esp_err.h"
+#include "esp_log.h"
 #include "esp_heap_caps.h"
 #include "esp_lcd_panel_io.h"
 #include "esp_lcd_panel_ops.h"
+#include "esp_lvgl_port.h"
 
 #include "st7789v2.h"
 #include "pwr_button.h"
@@ -19,32 +19,16 @@
 #include "lvgl.h"
 #include "ui.h"
 
-#define LCD_H_RES 240
-#define LCD_V_RES 280
-#define LVGL_BUF_LINES 140
-#define DISP_BUF_SIZE (LCD_H_RES * LVGL_BUF_LINES)
+static const char *TAG = "main";
 
 extern esp_lcd_panel_handle_t panel_handle;
 extern esp_lcd_panel_io_handle_t io_handle;
 
-static lv_disp_drv_t disp_drv;
-static lv_disp_draw_buf_t disp_buf;
-static lv_color_t *buf1 = NULL;
-static lv_color_t *buf2 = NULL;
-
-static SemaphoreHandle_t lvgl_mutex = NULL;
-
-static bool notify_lvgl_flush_ready(esp_lcd_panel_io_handle_t panel_io, 
-                                    esp_lcd_panel_io_event_data_t *edata, 
-                                    void *user_ctx) {
-    lv_disp_drv_t *disp_driver = (lv_disp_drv_t *)user_ctx;
-    lv_disp_flush_ready(disp_driver);
-    return false;
-}
-
-static void lvgl_flush_cb(lv_disp_drv_t *drv, const lv_area_t *area, lv_color_t *color_map) {
-    esp_lcd_panel_draw_bitmap(panel_handle, area->x1, area->y1, area->x2 + 1, area->y2 + 1, color_map);
-}
+#if LVGL_VERSION_MAJOR >= 9
+static lv_display_t *lvgl_disp = NULL;
+#else
+static lv_disp_t *lvgl_disp = NULL;
+#endif
 
 static void touch_read_cb(lv_indev_drv_t *indev_drv, lv_indev_data_t *data) {
     static uint16_t last_x = 0;
@@ -62,20 +46,6 @@ static void touch_read_cb(lv_indev_drv_t *indev_drv, lv_indev_data_t *data) {
     }
 }
 
-static void lvgl_handler_task(void *arg) {
-    while (1) {
-        lv_tick_inc(10);
-
-        if (xSemaphoreTake(lvgl_mutex, portMAX_DELAY) == pdTRUE) {
-            lv_timer_handler();
-            ui_tick();
-            xSemaphoreGive(lvgl_mutex);
-        }
-
-        vTaskDelay(pdMS_TO_TICKS(10));
-    }
-}
-
 static void battery_task(void *arg) {
     char voltage_str[16];
 
@@ -83,13 +53,69 @@ static void battery_task(void *arg) {
         uint32_t voltage_mv = battery_get_voltage_mv();
         snprintf(voltage_str, sizeof(voltage_str), "%.2f V", voltage_mv / 1000.0f);
 
-        if (xSemaphoreTake(lvgl_mutex, portMAX_DELAY) == pdTRUE) {
+        if (lvgl_port_lock(0)) {
             set_var_battery_voltage(voltage_str);
-            xSemaphoreGive(lvgl_mutex);
+            lvgl_port_unlock();
         }
 
         vTaskDelay(pdMS_TO_TICKS(5000));
     }
+}
+
+static void eez_flow_task(void *arg) {
+    while (1) {
+        if (lvgl_port_lock(0)) {
+            ui_tick();
+            lvgl_port_unlock();
+        }
+        vTaskDelay(pdMS_TO_TICKS(10));
+    }
+}
+
+static esp_err_t app_lvgl_init(void) {
+    const lvgl_port_cfg_t lvgl_cfg = {
+        .task_priority = 4,       /* LVGL task priority */
+        .task_stack = 4096,       /* LVGL task stack size */
+        .task_affinity = -1,      /* LVGL task pinned to core (-1 is no affinity) */
+        .task_max_sleep_ms = 500, /* Maximum sleep in LVGL task */
+        .timer_period_ms = 5      /* LVGL timer tick period in ms */
+    };
+    ESP_RETURN_ON_ERROR(lvgl_port_init(&lvgl_cfg), TAG, "LVGL port initialization failed");
+
+    
+    /* Add LCD screen */
+    ESP_LOGD(TAG, "Add LCD screen");
+    const lvgl_port_display_cfg_t disp_cfg = {
+        .io_handle = io_handle,
+        .panel_handle = panel_handle,
+        .buffer_size = LCD_H_RES * 50 * sizeof(uint16_t),
+        .double_buffer = 1,
+        .hres = LCD_H_RES,
+        .vres = LCD_V_RES,
+        .monochrome = false,
+        /* Rotation values must be same as used in esp_lcd for initial settings of the screen */
+        .rotation = {
+            .swap_xy = false,
+            .mirror_x = false,
+            .mirror_y = false,
+        },
+        .flags = {
+            .buff_dma = true,
+        }};
+    lvgl_disp = lvgl_port_add_disp(&disp_cfg);
+
+    if (!lvgl_disp) {
+        return ESP_FAIL;
+    }
+
+    lvgl_port_lock(0);
+    static lv_indev_drv_t indev_drv;
+    lv_indev_drv_init(&indev_drv);
+    indev_drv.type = LV_INDEV_TYPE_POINTER;
+    indev_drv.read_cb = touch_read_cb;
+    lv_indev_drv_register(&indev_drv);
+    lvgl_port_unlock();
+    return ESP_OK;
 }
 
 void app_main(void)
@@ -99,38 +125,14 @@ void app_main(void)
     touch_init_i2c();
     st7789vw_set_brightness(10);
 
-    lvgl_mutex = xSemaphoreCreateMutex();
-    assert(lvgl_mutex != NULL);
+    ESP_ERROR_CHECK(app_lvgl_init());
 
-    lv_init();
     battery_adc_init();
 
-    buf1 = heap_caps_aligned_alloc(4, DISP_BUF_SIZE * sizeof(lv_color_t), MALLOC_CAP_DMA | MALLOC_CAP_INTERNAL);
-    buf2 = heap_caps_aligned_alloc(4, DISP_BUF_SIZE * sizeof(lv_color_t), MALLOC_CAP_DMA | MALLOC_CAP_INTERNAL);
-    assert(buf1 != NULL && buf2 != NULL);
-
-    lv_disp_draw_buf_init(&disp_buf, buf1, buf2, DISP_BUF_SIZE);
-
-    lv_disp_drv_init(&disp_drv);
-    disp_drv.hor_res = LCD_H_RES;
-    disp_drv.ver_res = LCD_V_RES;
-    disp_drv.flush_cb = lvgl_flush_cb;
-    disp_drv.draw_buf = &disp_buf;
-    lv_disp_drv_register(&disp_drv);
-
-    static lv_indev_drv_t indev_drv;
-    lv_indev_drv_init(&indev_drv);
-    indev_drv.type = LV_INDEV_TYPE_POINTER;
-    indev_drv.read_cb = touch_read_cb;
-    lv_indev_drv_register(&indev_drv);
-
-    const esp_lcd_panel_io_callbacks_t cbs = {
-        .on_color_trans_done = notify_lvgl_flush_ready,
-    };
-    ESP_ERROR_CHECK(esp_lcd_panel_io_register_event_callbacks(io_handle, &cbs, &disp_drv));
-
-    ui_init();
-
+    if (lvgl_port_lock(0)) {
+        ui_init();
+        lvgl_port_unlock();
+    }
     xTaskCreatePinnedToCore(battery_task, "battery_task", 2048, NULL, 3, NULL, 0);
-    xTaskCreatePinnedToCore(lvgl_handler_task, "lvgl_handler", 8192, NULL, 5, NULL, 1);
+    xTaskCreatePinnedToCore(eez_flow_task, "eez_flow_task", 3072, NULL, 4, NULL, 1);
 }
