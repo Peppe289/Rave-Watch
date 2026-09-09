@@ -15,6 +15,7 @@
 #include "esp_lcd_panel_ops.h"
 
 #include "st7789v2.h"
+#include "pwr_button.h"
 #include "cst816.h"
 #include "lvgl.h"
 #include "ui.h"
@@ -86,6 +87,7 @@ static void touch_read_cb(lv_indev_drv_t *indev_drv, lv_indev_data_t *data) {
 
 void app_main(void)
 {
+    board_power_latch();
     st7789vw_init_spi();
     touch_init_i2c();
     st7789vw_set_brightness(10);
