@@ -13,13 +13,27 @@
 objects_t objects;
 
 static const char *screen_names[] = { "Main", "SettingsPage", "DrawerPage" };
-static const char *object_names[] = { "main", "settings_page", "drawer_page", "btn_settings", "btn_app_drawer", "brightness_slider", "btn_home", "btn_home_drawer" };
+static const char *object_names[] = { "main", "settings_page", "drawer_page", "container_battery_voltage", "txt_battery_voltage", "btn_settings", "btn_app_drawer", "brightness_slider", "btn_home", "btn_home_drawer" };
 
 //
 // Event handlers
 //
 
 lv_obj_t *tick_value_change_obj;
+
+static void event_handler_cb_main_txt_battery_voltage(lv_event_t *e) {
+    lv_event_code_t event = lv_event_get_code(e);
+    void *flowState = lv_event_get_user_data(e);
+    (void)flowState;
+    
+    if (event == LV_EVENT_VALUE_CHANGED) {
+        lv_obj_t *ta = lv_event_get_target(e);
+        if (tick_value_change_obj != ta) {
+            const char *value = lv_textarea_get_text(ta);
+            assignStringProperty(flowState, 3, 3, value, "Failed to assign Text in Textarea widget");
+        }
+    }
+}
 
 static void event_handler_cb_main_btn_settings(lv_event_t *e) {
     lv_event_code_t event = lv_event_get_code(e);
@@ -28,7 +42,7 @@ static void event_handler_cb_main_btn_settings(lv_event_t *e) {
     
     if (event == LV_EVENT_PRESSED) {
         e->user_data = (void *)0;
-        flowPropagateValueLVGLEvent(flowState, 2, 0, e);
+        flowPropagateValueLVGLEvent(flowState, 4, 0, e);
     }
 }
 
@@ -39,7 +53,7 @@ static void event_handler_cb_main_btn_app_drawer(lv_event_t *e) {
     
     if (event == LV_EVENT_PRESSED) {
         e->user_data = (void *)0;
-        flowPropagateValueLVGLEvent(flowState, 4, 0, e);
+        flowPropagateValueLVGLEvent(flowState, 6, 0, e);
     }
 }
 
@@ -105,6 +119,43 @@ void create_screen_main() {
             {
                 lv_obj_t *parent_obj = obj;
                 {
+                    // ContainerBatteryVoltage
+                    lv_obj_t *obj = lv_obj_create(parent_obj);
+                    objects.container_battery_voltage = obj;
+                    lv_obj_set_pos(obj, 0, 0);
+                    lv_obj_set_size(obj, 240, 38);
+                    lv_obj_set_style_pad_left(obj, 0, LV_PART_MAIN | LV_STATE_DEFAULT);
+                    lv_obj_set_style_pad_top(obj, 0, LV_PART_MAIN | LV_STATE_DEFAULT);
+                    lv_obj_set_style_pad_right(obj, 0, LV_PART_MAIN | LV_STATE_DEFAULT);
+                    lv_obj_set_style_pad_bottom(obj, 0, LV_PART_MAIN | LV_STATE_DEFAULT);
+                    lv_obj_set_style_bg_opa(obj, 0, LV_PART_MAIN | LV_STATE_DEFAULT);
+                    lv_obj_set_style_border_width(obj, 0, LV_PART_MAIN | LV_STATE_DEFAULT);
+                    lv_obj_set_style_radius(obj, 0, LV_PART_MAIN | LV_STATE_DEFAULT);
+                    {
+                        lv_obj_t *parent_obj = obj;
+                        {
+                            // txtBatteryVoltage
+                            lv_obj_t *obj = lv_textarea_create(parent_obj);
+                            objects.txt_battery_voltage = obj;
+                            lv_obj_set_pos(obj, 125, 4);
+                            lv_obj_set_size(obj, 106, 31);
+                            lv_textarea_set_max_length(obj, 20);
+                            lv_textarea_set_one_line(obj, false);
+                            lv_textarea_set_password_mode(obj, false);
+                            lv_obj_add_event_cb(obj, event_handler_cb_main_txt_battery_voltage, LV_EVENT_ALL, flowState);
+                            lv_obj_clear_flag(obj, LV_OBJ_FLAG_CLICKABLE|LV_OBJ_FLAG_CLICK_FOCUSABLE|LV_OBJ_FLAG_SCROLLABLE|LV_OBJ_FLAG_SCROLL_CHAIN_HOR|LV_OBJ_FLAG_SCROLL_CHAIN_VER|LV_OBJ_FLAG_SCROLL_ELASTIC|LV_OBJ_FLAG_SCROLL_MOMENTUM|LV_OBJ_FLAG_SCROLL_ON_FOCUS|LV_OBJ_FLAG_SCROLL_WITH_ARROW|LV_OBJ_FLAG_SNAPPABLE);
+                            lv_obj_set_style_bg_color(obj, lv_color_hex(0xaca8fa), LV_PART_MAIN | LV_STATE_DEFAULT);
+                            lv_obj_set_style_bg_opa(obj, 0, LV_PART_MAIN | LV_STATE_DEFAULT);
+                            lv_obj_set_style_border_opa(obj, 0, LV_PART_MAIN | LV_STATE_DEFAULT);
+                            lv_obj_set_style_border_width(obj, 0, LV_PART_MAIN | LV_STATE_DEFAULT);
+                            lv_obj_set_style_text_color(obj, lv_color_hex(0xe3e3e3), LV_PART_MAIN | LV_STATE_DEFAULT);
+                            lv_obj_set_style_text_font(obj, &lv_font_montserrat_14, LV_PART_MAIN | LV_STATE_DEFAULT);
+                            lv_obj_set_style_text_opa(obj, 255, LV_PART_MAIN | LV_STATE_DEFAULT);
+                            lv_obj_set_style_text_align(obj, LV_TEXT_ALIGN_CENTER, LV_PART_MAIN | LV_STATE_DEFAULT);
+                        }
+                    }
+                }
+                {
                     // BtnSettings
                     lv_obj_t *obj = lv_obj_create(parent_obj);
                     objects.btn_settings = obj;
@@ -166,6 +217,16 @@ void create_screen_main() {
 void tick_screen_main() {
     void *flowState = getFlowState(0, 0);
     (void)flowState;
+    {
+        const char *new_val = evalTextProperty(flowState, 3, 3, "Failed to evaluate Text in Textarea widget");
+        const char *cur_val = lv_textarea_get_text(objects.txt_battery_voltage);
+        uint32_t max_length = lv_textarea_get_max_length(objects.txt_battery_voltage);
+        if (strncmp(new_val, cur_val, max_length) != 0) {
+            tick_value_change_obj = objects.txt_battery_voltage;
+            lv_textarea_set_text(objects.txt_battery_voltage, new_val);
+            tick_value_change_obj = NULL;
+        }
+    }
 }
 
 void create_screen_settings_page() {

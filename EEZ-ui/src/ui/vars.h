@@ -18,6 +18,9 @@ enum FlowGlobalVariables {
 
 // Native global variables
 
+extern const char *get_var_battery_voltage();
+extern void set_var_battery_voltage(const char *value);
+
 #ifdef __cplusplus
 }
 #endif

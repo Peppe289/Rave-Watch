@@ -1,8 +1,11 @@
 {
   "navigation": {
     "selectedUserPageObject": "[Rave-Watch.eez-project]:/userPages/0",
+    "selectedGlobalVariableObject": "[Rave-Watch.eez-project]:/variables/globalVariables/0",
     "selectedBitmapObject": "[Rave-Watch.eez-project]:/bitmaps/1",
-    "subnavigationSelectedItems": {}
+    "subnavigationSelectedItems": {
+      "variables-tab/sub-navigation/selected-item": "Global"
+    }
   },
   "layoutModel": {
     "rootEditor": {
@@ -78,6 +81,7 @@
           },
           {
             "type": "border",
+            "selected": 0,
             "location": "bottom",
             "children": [
               {
@@ -161,7 +165,7 @@
                 {
                   "type": "tabset",
                   "id": "#4135c7c5-e2b8-452e-85a1-3cc69de0b8ab",
-                  "weight": 1,
+                  "weight": 1.456221198156682,
                   "enableClose": false,
                   "children": [
                     {
@@ -172,13 +176,12 @@
                       "enableClose": false,
                       "icon": "svg:hierarchy"
                     }
-                  ],
-                  "active": true
+                  ]
                 },
                 {
                   "type": "tabset",
                   "id": "#c6d578a2-5dcd-45ca-a4ef-8933a85c83db",
-                  "weight": 1,
+                  "weight": 0.543778801843318,
                   "enableClose": false,
                   "children": [
                     {
@@ -223,7 +226,8 @@
                   },
                   "icon": "material:settings"
                 }
-              ]
+              ],
+              "active": true
             },
             {
               "type": "row",
@@ -1088,14 +1092,18 @@
       "selectionBack": {
         "0": {
           "0": {
-            "$selected": true
+            "0": {
+              "0": {}
+            },
+            "1": {},
+            "2": {}
           }
         }
       },
       "transform": {
         "translate": {
-          "x": -150.3596110357305,
-          "y": -269.2872089010441
+          "x": -109.9299235357305,
+          "y": -156.9551776510441
         },
         "scale": 1.25
       },
@@ -1109,14 +1117,38 @@
     "[Rave-Watch.eez-project]:/userPages/1[flow-state]": {
       "selectionFront": {},
       "selectionBack": {
-        "0": {}
+        "0": {
+          "0": {},
+          "1": {}
+        }
       },
       "transform": {
         "translate": {
           "x": -270.9453125,
           "y": -264.9296875
         },
-        "scale": 1.5
+        "scale": 1.25
+      },
+      "timeline": {
+        "isEditorActive": false,
+        "position": 0,
+        "secondToPx": 200,
+        "scrollLeft": 0
+      }
+    },
+    "[Rave-Watch.eez-project]:/userPages/2[flow-state]": {
+      "selectionFront": {},
+      "selectionBack": {
+        "0": {
+          "0": {}
+        }
+      },
+      "transform": {
+        "translate": {
+          "x": -120,
+          "y": -140
+        },
+        "scale": 1.25
       },
       "timeline": {
         "isEditorActive": false,
@@ -1142,7 +1174,10 @@
   "lvglState": "DEFAULT",
   "lvglExpandedPropertiesGroup": [
     "BACKGROUND",
-    "MARGIN"
+    "MARGIN",
+    "MISCELLANEOUS",
+    "BORDER",
+    "TEXT"
   ],
   "showInactiveFlowsInDebugger": true,
   "globalFlowZoom": true,

@@ -17,6 +17,7 @@
 #include "st7789v2.h"
 #include "pwr_button.h"
 #include "cst816.h"
+#include "voltage.h"
 #include "lvgl.h"
 #include "ui.h"
 
@@ -85,6 +86,17 @@ static void touch_read_cb(lv_indev_drv_t *indev_drv, lv_indev_data_t *data) {
     }
 }
 
+static void battery_task(void *arg) {
+    while (1) {
+        uint32_t voltage_mv = battery_get_voltage_mv();
+        char *voltage_str = (char *)malloc(16);
+        snprintf(voltage_str, 16, "%.2f V", voltage_mv / 1000.0f);
+        set_var_battery_voltage(voltage_str);
+        free(voltage_str);
+        vTaskDelay(pdMS_TO_TICKS(5000));
+    }
+}
+
 void app_main(void)
 {
     board_power_latch();
@@ -93,6 +105,7 @@ void app_main(void)
     st7789vw_set_brightness(10);
 
     lv_init();
+    battery_adc_init();
 
     buf1 = heap_caps_aligned_alloc(4, DISP_BUF_SIZE * sizeof(lv_color_t), MALLOC_CAP_DMA | MALLOC_CAP_INTERNAL);
     assert(buf1 != NULL);
@@ -121,6 +134,7 @@ void app_main(void)
     // Carica la UI di EEZ Studio
     ui_init();
 
+    xTaskCreatePinnedToCore(battery_task, "battery_task", 2048, NULL, 5, NULL, 0);
     xTaskCreatePinnedToCore(lvgl_tick_task, "lvgl_tick", 2048, NULL, 5, NULL, 0);
     xTaskCreatePinnedToCore(lvgl_handler_task, "lvgl_handler", 8192, NULL, 4, NULL, 1);
 }

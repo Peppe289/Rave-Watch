@@ -109,7 +109,16 @@
   },
   "variables": {
     "objID": "c6c71e16-53e1-217f-d03b-cef56c6b037a",
-    "globalVariables": [],
+    "globalVariables": [
+      {
+        "objID": "ca2d8260-abbb-43a7-c2b1-78806df29ce4",
+        "name": "battery_voltage",
+        "type": "string",
+        "defaultValue": "\"\"",
+        "persistent": false,
+        "native": true
+      }
+    ],
     "structures": [],
     "enums": []
   },
@@ -173,6 +182,108 @@
               "widthUnit": "px",
               "heightUnit": "px",
               "children": [
+                {
+                  "objID": "a0394bc4-3ea1-46bb-91a1-8abfab64b539",
+                  "type": "LVGLContainerWidget",
+                  "left": 0,
+                  "top": 0,
+                  "width": 240,
+                  "height": 38,
+                  "customInputs": [],
+                  "customOutputs": [],
+                  "style": {
+                    "objID": "eac9e927-357f-4b10-ab4f-7211235aafec",
+                    "useStyle": "default",
+                    "conditionalStyles": [],
+                    "childStyles": []
+                  },
+                  "timeline": [],
+                  "eventHandlers": [],
+                  "identifier": "ContainerBatteryVoltage",
+                  "leftUnit": "px",
+                  "topUnit": "px",
+                  "widthUnit": "px",
+                  "heightUnit": "px",
+                  "children": [
+                    {
+                      "objID": "5771348f-8f9b-4abe-ce1b-a5a36943ba35",
+                      "type": "LVGLTextareaWidget",
+                      "left": 125,
+                      "top": 4,
+                      "width": 106,
+                      "height": 31,
+                      "customInputs": [],
+                      "customOutputs": [],
+                      "style": {
+                        "objID": "1139ae20-e4aa-48cc-a42e-79b8e11826ce",
+                        "useStyle": "default",
+                        "conditionalStyles": [],
+                        "childStyles": []
+                      },
+                      "timeline": [],
+                      "eventHandlers": [],
+                      "identifier": "txtBatteryVoltage",
+                      "leftUnit": "px",
+                      "topUnit": "px",
+                      "widthUnit": "px",
+                      "heightUnit": "px",
+                      "children": [],
+                      "widgetFlags": "GESTURE_BUBBLE|PRESS_LOCK",
+                      "hiddenFlagType": "literal",
+                      "clickableFlag": false,
+                      "clickableFlagType": "literal",
+                      "flagScrollbarMode": "",
+                      "flagScrollDirection": "",
+                      "scrollSnapX": "",
+                      "scrollSnapY": "",
+                      "checkedStateType": "literal",
+                      "disabledStateType": "literal",
+                      "states": "",
+                      "localStyles": {
+                        "objID": "e05d208e-6713-4168-b117-a98efd080377",
+                        "definition": {
+                          "MAIN": {
+                            "DEFAULT": {
+                              "bg_color": "#aca8fa",
+                              "bg_opa": 0,
+                              "border_opa": 0,
+                              "border_width": 0,
+                              "text_color": "#E3E3E3",
+                              "text_font": "MONTSERRAT_14",
+                              "text_opa": 255,
+                              "text_align": "CENTER"
+                            }
+                          }
+                        }
+                      },
+                      "group": "",
+                      "groupIndex": 0,
+                      "text": "battery_voltage",
+                      "textType": "expression",
+                      "placeholder": "",
+                      "oneLineMode": false,
+                      "passwordMode": false,
+                      "acceptedCharacters": "",
+                      "maxTextLength": 20
+                    }
+                  ],
+                  "widgetFlags": "CLICK_FOCUSABLE|GESTURE_BUBBLE|PRESS_LOCK|SCROLLABLE|SCROLL_CHAIN_HOR|SCROLL_CHAIN_VER|SCROLL_ELASTIC|SCROLL_MOMENTUM|SCROLL_WITH_ARROW|SNAPPABLE",
+                  "hiddenFlagType": "literal",
+                  "clickableFlag": true,
+                  "clickableFlagType": "literal",
+                  "flagScrollbarMode": "",
+                  "flagScrollDirection": "",
+                  "scrollSnapX": "",
+                  "scrollSnapY": "",
+                  "checkedStateType": "literal",
+                  "disabledStateType": "literal",
+                  "states": "",
+                  "localStyles": {
+                    "objID": "0af0f5fa-e2f8-47b3-b8a5-a2937934305d"
+                  },
+                  "group": "",
+                  "groupIndex": 0
+                },
                 {
                   "objID": "93b14419-7326-4c66-9529-933526f6ca6a",
                   "type": "LVGLContainerWidget",
