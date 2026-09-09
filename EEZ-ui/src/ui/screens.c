@@ -13,13 +13,24 @@
 objects_t objects;
 
 static const char *screen_names[] = { "Main", "SettingsPage", "DrawerPage" };
-static const char *object_names[] = { "main", "settings_page", "drawer_page", "container_battery_voltage", "txt_battery_voltage", "btn_settings", "btn_app_drawer", "brightness_slider", "btn_home", "btn_home_drawer" };
+static const char *object_names[] = { "main", "settings_page", "drawer_page", "btn_suspend", "container_battery_voltage", "txt_battery_voltage", "btn_settings", "btn_app_drawer", "brightness_slider", "btn_home", "btn_home_drawer" };
 
 //
 // Event handlers
 //
 
 lv_obj_t *tick_value_change_obj;
+
+static void event_handler_cb_main_btn_suspend(lv_event_t *e) {
+    lv_event_code_t event = lv_event_get_code(e);
+    void *flowState = lv_event_get_user_data(e);
+    (void)flowState;
+    
+    if (event == LV_EVENT_PRESSED) {
+        e->user_data = (void *)0;
+        action_start_suspend_mode(e);
+    }
+}
 
 static void event_handler_cb_main_txt_battery_voltage(lv_event_t *e) {
     lv_event_code_t event = lv_event_get_code(e);
@@ -30,7 +41,7 @@ static void event_handler_cb_main_txt_battery_voltage(lv_event_t *e) {
         lv_obj_t *ta = lv_event_get_target(e);
         if (tick_value_change_obj != ta) {
             const char *value = lv_textarea_get_text(ta);
-            assignStringProperty(flowState, 3, 3, value, "Failed to assign Text in Textarea widget");
+            assignStringProperty(flowState, 5, 3, value, "Failed to assign Text in Textarea widget");
         }
     }
 }
@@ -42,7 +53,7 @@ static void event_handler_cb_main_btn_settings(lv_event_t *e) {
     
     if (event == LV_EVENT_PRESSED) {
         e->user_data = (void *)0;
-        flowPropagateValueLVGLEvent(flowState, 4, 0, e);
+        flowPropagateValueLVGLEvent(flowState, 6, 0, e);
     }
 }
 
@@ -53,7 +64,7 @@ static void event_handler_cb_main_btn_app_drawer(lv_event_t *e) {
     
     if (event == LV_EVENT_PRESSED) {
         e->user_data = (void *)0;
-        flowPropagateValueLVGLEvent(flowState, 6, 0, e);
+        flowPropagateValueLVGLEvent(flowState, 8, 0, e);
     }
 }
 
@@ -118,6 +129,33 @@ void create_screen_main() {
             lv_obj_set_style_radius(obj, 0, LV_PART_MAIN | LV_STATE_DEFAULT);
             {
                 lv_obj_t *parent_obj = obj;
+                {
+                    // BtnSuspend
+                    lv_obj_t *obj = lv_obj_create(parent_obj);
+                    objects.btn_suspend = obj;
+                    lv_obj_set_pos(obj, 94, 220);
+                    lv_obj_set_size(obj, 52, 52);
+                    lv_obj_set_style_pad_left(obj, 0, LV_PART_MAIN | LV_STATE_DEFAULT);
+                    lv_obj_set_style_pad_top(obj, 0, LV_PART_MAIN | LV_STATE_DEFAULT);
+                    lv_obj_set_style_pad_right(obj, 0, LV_PART_MAIN | LV_STATE_DEFAULT);
+                    lv_obj_set_style_pad_bottom(obj, 0, LV_PART_MAIN | LV_STATE_DEFAULT);
+                    lv_obj_set_style_border_width(obj, 0, LV_PART_MAIN | LV_STATE_DEFAULT);
+                    lv_obj_add_event_cb(obj, event_handler_cb_main_btn_suspend, LV_EVENT_ALL, flowState);
+                    lv_obj_add_flag(obj, LV_OBJ_FLAG_EVENT_BUBBLE);
+                    add_style_secondary_container(obj);
+                    lv_obj_set_style_border_color(obj, lv_color_hex(0xe9678f), LV_PART_MAIN | LV_STATE_DEFAULT);
+                    lv_obj_set_style_border_opa(obj, 255, LV_PART_MAIN | LV_STATE_DEFAULT);
+                    {
+                        lv_obj_t *parent_obj = obj;
+                        {
+                            lv_obj_t *obj = lv_img_create(parent_obj);
+                            lv_obj_set_pos(obj, 14, 14);
+                            lv_obj_set_size(obj, LV_SIZE_CONTENT, LV_SIZE_CONTENT);
+                            lv_img_set_src(obj, &img_suspend_bit_map);
+                            lv_obj_clear_flag(obj, LV_OBJ_FLAG_ADV_HITTEST|LV_OBJ_FLAG_CLICK_FOCUSABLE|LV_OBJ_FLAG_SCROLLABLE|LV_OBJ_FLAG_SCROLL_CHAIN_HOR|LV_OBJ_FLAG_SCROLL_CHAIN_VER|LV_OBJ_FLAG_SCROLL_ELASTIC|LV_OBJ_FLAG_SCROLL_MOMENTUM|LV_OBJ_FLAG_SCROLL_WITH_ARROW);
+                        }
+                    }
+                }
                 {
                     // ContainerBatteryVoltage
                     lv_obj_t *obj = lv_obj_create(parent_obj);
@@ -218,7 +256,7 @@ void tick_screen_main() {
     void *flowState = getFlowState(0, 0);
     (void)flowState;
     {
-        const char *new_val = evalTextProperty(flowState, 3, 3, "Failed to evaluate Text in Textarea widget");
+        const char *new_val = evalTextProperty(flowState, 5, 3, "Failed to evaluate Text in Textarea widget");
         const char *cur_val = lv_textarea_get_text(objects.txt_battery_voltage);
         uint32_t max_length = lv_textarea_get_max_length(objects.txt_battery_voltage);
         if (strncmp(new_val, cur_val, max_length) != 0) {

@@ -18,6 +18,7 @@
     "ui_image_grid_view_bit_map.c",
     "ui_image_home_bit_map.c",
     "ui_image_settings_bit_map.c",
+    "ui_image_suspend_bit_map.c",
     "vars.h"
   ]
 }

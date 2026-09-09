@@ -13,6 +13,7 @@
 #include "esp_lvgl_port.h"
 
 #include "st7789v2.h"
+#include "brightness.h"
 #include "pwr_button.h"
 #include "cst816.h"
 #include "voltage.h"
@@ -21,8 +22,16 @@
 
 static const char *TAG = "main";
 
+static bool s_suspend_display = false;
+
 extern esp_lcd_panel_handle_t panel_handle;
 extern esp_lcd_panel_io_handle_t io_handle;
+
+static lv_indev_drv_t indev_drv;
+static lv_indev_t *touch_indev = NULL;
+
+static TaskHandle_t battery_task_handle = NULL;
+static TaskHandle_t eez_flow_task_handle = NULL;
 
 #if LVGL_VERSION_MAJOR >= 9
 static lv_display_t *lvgl_disp = NULL;
@@ -109,13 +118,59 @@ static esp_err_t app_lvgl_init(void) {
     }
 
     lvgl_port_lock(0);
-    static lv_indev_drv_t indev_drv;
     lv_indev_drv_init(&indev_drv);
     indev_drv.type = LV_INDEV_TYPE_POINTER;
     indev_drv.read_cb = touch_read_cb;
-    lv_indev_drv_register(&indev_drv);
+    touch_indev = lv_indev_drv_register(&indev_drv);
     lvgl_port_unlock();
     return ESP_OK;
+}
+
+void freeze_background_tasks(void) {
+    if (battery_task_handle != NULL) {
+        vTaskSuspend(battery_task_handle);
+    }
+    if (eez_flow_task_handle != NULL) {
+        vTaskSuspend(eez_flow_task_handle);
+    }
+}
+
+void resume_background_tasks(void) {
+    if (battery_task_handle != NULL) {
+        vTaskResume(battery_task_handle);
+    }
+    if (eez_flow_task_handle != NULL) {
+        vTaskResume(eez_flow_task_handle);
+    }
+}
+
+static void resume_display_task(void *arg) {
+    vTaskDelay(pdMS_TO_TICKS(500));
+    while (1) {
+        if (s_suspend_display) {
+            if (cst816_is_pressed()) {
+                resume_display();
+                s_suspend_display = false;
+                resume_background_tasks();
+                if (lvgl_port_lock(0)) {
+                    lv_indev_enable(touch_indev, true);
+                    lvgl_port_unlock();
+                }
+                vTaskDelete(NULL);
+            }
+        } else s_suspend_display = true;
+        vTaskDelay(pdMS_TO_TICKS(100));
+    }
+}
+
+void action_start_suspend_mode(lv_event_t *e) {
+    freeze_background_tasks();
+    suspend_display();
+    if (lvgl_port_lock(0)) {
+        lv_indev_enable(touch_indev, false);
+        lvgl_port_unlock();
+    }
+    xTaskCreatePinnedToCore(resume_display_task, "resume_display_task", 2048, NULL, 5, NULL, 1);   
 }
 
 void app_main(void)
@@ -123,7 +178,7 @@ void app_main(void)
     board_power_latch();
     st7789vw_init_spi();
     touch_init_i2c();
-    st7789vw_set_brightness(10);
+    st7789vw_set_brightness(get_brightness_level());
 
     ESP_ERROR_CHECK(app_lvgl_init());
 
@@ -133,6 +188,6 @@ void app_main(void)
         ui_init();
         lvgl_port_unlock();
     }
-    xTaskCreatePinnedToCore(battery_task, "battery_task", 2048, NULL, 3, NULL, 0);
-    xTaskCreatePinnedToCore(eez_flow_task, "eez_flow_task", 3072, NULL, 4, NULL, 1);
+    xTaskCreatePinnedToCore(battery_task, "battery_task", 2048, NULL, 3, &battery_task_handle, 0);
+    xTaskCreatePinnedToCore(eez_flow_task, "eez_flow_task", 3072, NULL, 4, &eez_flow_task_handle, 1);
 }

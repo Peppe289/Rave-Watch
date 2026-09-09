@@ -132,6 +132,16 @@
       "userProperties": [],
       "name": "change_brightness_cb",
       "implementationType": "native"
+    },
+    {
+      "objID": "6f531622-1a86-4f78-ec39-5674cd096cdf",
+      "components": [],
+      "connectionLines": [],
+      "localVariables": [],
+      "componentGroups": [],
+      "userProperties": [],
+      "name": "start_suspend_mode",
+      "implementationType": "native"
     }
   ],
   "userPages": [
@@ -182,6 +192,113 @@
               "widthUnit": "px",
               "heightUnit": "px",
               "children": [
+                {
+                  "objID": "6c423013-53fd-41e8-eb51-a522a2303f33",
+                  "type": "LVGLContainerWidget",
+                  "left": 94,
+                  "top": 220,
+                  "width": 52,
+                  "height": 52,
+                  "customInputs": [],
+                  "customOutputs": [],
+                  "style": {
+                    "objID": "d0b3f3c0-7cf5-4bdf-a848-5187e373ea3a",
+                    "useStyle": "default",
+                    "conditionalStyles": [],
+                    "childStyles": []
+                  },
+                  "timeline": [],
+                  "eventHandlers": [
+                    {
+                      "objID": "659b4ac0-1ed4-4d2d-de30-636be62b3613",
+                      "eventName": "PRESSED",
+                      "handlerType": "action",
+                      "action": "start_suspend_mode",
+                      "userData": 0
+                    }
+                  ],
+                  "identifier": "BtnSuspend",
+                  "leftUnit": "px",
+                  "topUnit": "px",
+                  "widthUnit": "px",
+                  "heightUnit": "px",
+                  "children": [
+                    {
+                      "objID": "7671d62c-4121-4206-d15e-89cbeee87af4",
+                      "type": "LVGLImageWidget",
+                      "left": 14,
+                      "top": 14,
+                      "width": 24,
+                      "height": 24,
+                      "customInputs": [],
+                      "customOutputs": [],
+                      "style": {
+                        "objID": "72cd7718-bf75-4a84-c5d3-370cd74cca91",
+                        "useStyle": "default",
+                        "conditionalStyles": [],
+                        "childStyles": []
+                      },
+                      "timeline": [],
+                      "eventHandlers": [],
+                      "leftUnit": "px",
+                      "topUnit": "px",
+                      "widthUnit": "content",
+                      "heightUnit": "content",
+                      "children": [],
+                      "widgetFlags": "GESTURE_BUBBLE|PRESS_LOCK|SNAPPABLE",
+                      "hiddenFlagType": "literal",
+                      "clickableFlagType": "literal",
+                      "flagScrollbarMode": "",
+                      "flagScrollDirection": "",
+                      "scrollSnapX": "",
+                      "scrollSnapY": "",
+                      "checkedStateType": "literal",
+                      "disabledStateType": "literal",
+                      "states": "",
+                      "localStyles": {
+                        "objID": "b6035ee3-01b8-4ebf-f739-29875effd205"
+                      },
+                      "group": "",
+                      "groupIndex": 0,
+                      "image": "Suspend BitMap",
+                      "setPivot": false,
+                      "pivotX": 0,
+                      "pivotY": 0,
+                      "zoom": 256,
+                      "angle": 0,
+                      "innerAlign": "CENTER",
+                      "sizeMode": "VIRTUAL",
+                      "value": 0,
+                      "valueType": "literal",
+                      "previewValue": 0
+                    }
+                  ],
+                  "widgetFlags": "CLICK_FOCUSABLE|GESTURE_BUBBLE|PRESS_LOCK|SCROLLABLE|SCROLL_CHAIN_HOR|SCROLL_CHAIN_VER|SCROLL_ELASTIC|SCROLL_MOMENTUM|SCROLL_WITH_ARROW|SNAPPABLE|EVENT_BUBBLE",
+                  "hiddenFlagType": "literal",
+                  "clickableFlag": true,
+                  "clickableFlagType": "literal",
+                  "flagScrollbarMode": "",
+                  "flagScrollDirection": "",
+                  "scrollSnapX": "",
+                  "scrollSnapY": "",
+                  "checkedStateType": "literal",
+                  "disabledStateType": "literal",
+                  "states": "",
+                  "useStyle": "SecondaryContainer",
+                  "localStyles": {
+                    "objID": "5b912798-f498-4751-a947-4762ce914a38",
+                    "definition": {
+                      "MAIN": {
+                        "DEFAULT": {
+                          "border_color": "#e9678f",
+                          "border_opa": 255
+                        }
+                      }
+                    }
+                  },
+                  "group": "",
+                  "groupIndex": 0
+                },
                 {
                   "objID": "a0394bc4-3ea1-46bb-91a1-8abfab64b539",
                   "type": "LVGLContainerWidget",
@@ -1188,6 +1305,15 @@
       "objID": "f3ec024d-62f9-430d-8a8a-a8d629c73c01",
       "name": "Settings BitMap",
       "image": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABgAAAAYCAYAAADgdz34AAACd0lEQVRIS7WUPWsUURSG3zcsGqKioDbZORPyD0RR0EqJoJWN4EellSgqKBJUMJqohYaAglG01EYFG0sx0VKMYH5C4J7ZVBEUEjEE5sjd3XvZnd1lA0me6nzNeWfunHuIDYbR2iBWJaCqFp0GRKTr810LPOsqMD8/39ff3/83BhoEQsOiH2j3bIuAqv4DsJnkVLlcPq6q30nu87migJn9FJEDlUrlk5kNAVgWkd5apxpNAlmWDZnZVAw088M384Zzbobk/pBohOTRJEmmox8MT3gzknsAnDOz6wB+iciuUNOIqi4A2EnyycrKyptSqTTr441HFw3n3AuSlwAsicjWEG8ky7ILeZ6XROQlyTwm6qjqEoA+AM9F5IqPRQFV/Q1gu7fzPL84MDDwKuSyLDtlZu+D7zGzu2maPgi+c+4Mybd194+I7PBG8YieAagqN555pzFNkqSX5LKqfgVwuB6eFJGrdbt1ipxzd0j6NxsXkZuqehLAh1jQzJiIjKrqOIBhMxtJ0/RhzHYQGCF5H8CEiAw7506Q/BgLmhkVkbEsyybM7AaA2yLyKGaLAqo6CeBy3f0iIn62V3NEfrSrtWY2kabpcKhp+5PN7Gyapu9Czjl3mmT069wTEf+lVQo/OY52FFinMV0EsAXAYxG55WPFI4oXLc/z8ySvAVgQkd2hppFw0czsaU9Pz2sz63zRPF1WxayI7PWGqvpG/ra3QPJQkiTfoh+MgHNumeQmktPlcvlYpVKZMbNq4zbLzt+Vg1mWfQZwhORikiTbap1qtAi0W7mhYVGguK7n5uZ6BwcH/TaOtAi0o9OYFgXa0bXAs+ECa2FVX7AW/gOLpjYoiYvSQAAAABBkZUJHMDYwRTE0Qzk3NTVEQTFGRFCiLvMAAAAASUVORK5CYII=",
+      "bpp": 32,
+      "alwaysBuild": false,
+      "lvglBinaryOutputFormat": 3,
+      "lvglDither": false
+    },
+    {
+      "objID": "268c16ac-ae60-466a-9c76-3f5969562e64",
+      "name": "Suspend BitMap",
+      "image": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABgAAAAYCAYAAADgdz34AAABqElEQVRIS8WSQUrDUBCGZ5rWeABxkWZCuhAEQYXewFOI4gEEQXDnDdwJCp6g0GN4ARXBhS5Kq+9BgwsPUH0hMtJ5pM1LYyvqt/rnfzP95+UV4ZdBq36JQoDWOrPFAhDRxG/+fYAgN5neaJqqPqfJVA0KVX1Ok6kaFKr6nCZTNShU9TlNRgYRcSUMwzfx8/R6vVXf919ZLxJwBACXrMuGZQkAOCaii7GewDkoaK1TAKix9jwvDoLghXWSJLExZjBuK12AKT0QtNYfAFC3xiRnRHRqKweLBlwT0Y6tZjAzIPeNwRjTarVaz1IzSZJsGGNuAcAfWyPP87aDIHga1+UBSqlDRLwCgIyIvt4hj1Kqi4i71siRZVk3iqI91qUBsn2tVouazaYWn+n3+1uNRuPeGm42ieihMsD1D1FKvSNigzWf53tFZ1k2iqJouTAszArIv01ZgNSFYeG/A0YAsMSLzLjBiIiKnyh/xWkQ8SQMw/PBYLBer9cf7YGbNSLqzRXAyJtorTsAsC/+FB0iOmBRCJiH4XDYTtP0xhoAkKZpO47jO6l/FPAdPgEL69sZRtSVmQAAABBkZUJHNkJBOTcxNDZGQjk3QjE1OELqqgUAAAAASUVORK5CYII=",
       "bpp": 32,
       "alwaysBuild": false,
       "lvglBinaryOutputFormat": 3,

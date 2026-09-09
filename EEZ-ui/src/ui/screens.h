@@ -21,6 +21,7 @@ typedef struct _objects_t {
     lv_obj_t *main;
     lv_obj_t *settings_page;
     lv_obj_t *drawer_page;
+    lv_obj_t *btn_suspend;
     lv_obj_t *container_battery_voltage;
     lv_obj_t *txt_battery_voltage;
     lv_obj_t *btn_settings;
