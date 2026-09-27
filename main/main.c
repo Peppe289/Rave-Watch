@@ -1,4 +1,5 @@
 #include <stdio.h>
+#include <stdlib.h>
 
 #include "esp_check.h"
 #include "sdkconfig.h"
@@ -7,11 +8,14 @@
 #include "freertos/semphr.h"
 #include "esp_err.h"
 #include "esp_log.h"
+#include "esp_system.h"
 #include "esp_heap_caps.h"
 #include "esp_lcd_panel_io.h"
 #include "esp_lcd_panel_ops.h"
 #include "esp_lvgl_port.h"
-
+#include "nvs_flash.h"
+#include "bt.h"
+//#include "wifi.h"
 #include "st7789v2.h"
 #include "brightness.h"
 #include "pwr_button.h"
@@ -19,6 +23,7 @@
 #include "voltage.h"
 #include "lvgl.h"
 #include "ui.h"
+#include "screens.h"
 
 static const char *TAG = "main";
 
@@ -67,7 +72,7 @@ static void battery_task(void *arg) {
             lvgl_port_unlock();
         }
 
-        vTaskDelay(pdMS_TO_TICKS(5000));
+        vTaskDelay(pdMS_TO_TICKS(1000));
     }
 }
 
@@ -77,7 +82,7 @@ static void eez_flow_task(void *arg) {
             ui_tick();
             lvgl_port_unlock();
         }
-        vTaskDelay(pdMS_TO_TICKS(10));
+        vTaskDelay(pdMS_TO_TICKS(5));
     }
 }
 
@@ -173,21 +178,92 @@ void action_start_suspend_mode(lv_event_t *e) {
     xTaskCreatePinnedToCore(resume_display_task, "resume_display_task", 2048, NULL, 5, NULL, 1);   
 }
 
+static void cmd_brightness(const char *data) {
+    int level = atoi(data);
+    if (level < 0) level = 0;
+    if (level > 100) level = 100;
+    set_brightness_level((uint8_t)level);
+    ESP_LOGI(TAG, "BT: brightness = %d", level);
+}
+
+static void cmd_suspend(const char *data) {
+    (void)data;
+    freeze_background_tasks();
+    suspend_display();
+    if (lvgl_port_lock(0)) {
+        lv_indev_enable(touch_indev, false);
+        lvgl_port_unlock();
+    }
+    xTaskCreatePinnedToCore(resume_display_task, "resume_display_task", 2048, NULL, 5, NULL, 1);
+}
+
+static void cmd_resume(const char *data) {
+    (void)data;
+    s_suspend_display = false;
+    resume_display();
+    resume_background_tasks();
+    if (lvgl_port_lock(0)) {
+        lv_indev_enable(touch_indev, true);
+        lvgl_port_unlock();
+    }
+}
+
+static void cmd_battery(const char *data) {
+    (void)data;
+    uint32_t mv = battery_get_voltage_mv();
+    ESP_LOGI(TAG, "BT: battery = %.2f V", mv / 1000.0f);
+}
+
+static void cmd_log(const char *data) {
+    ESP_LOGI(TAG, "BT log: %s", data);
+}
+
+static void cmd_reboot(const char *data) {
+    (void)data;
+    ESP_LOGW(TAG, "BT: reboot richiesto");
+    vTaskDelay(pdMS_TO_TICKS(100));
+    esp_restart();
+}
+
+static void bt_cmds_register(void) {
+    bt_cmd_register("brightness", cmd_brightness);
+    bt_cmd_register("suspend",    cmd_suspend);
+    bt_cmd_register("resume",     cmd_resume);
+    bt_cmd_register("battery",    cmd_battery);
+    bt_cmd_register("log",        cmd_log);
+    bt_cmd_register("reboot",     cmd_reboot);
+}
+
+static void storage_nvs_init() {
+    esp_err_t ret;
+
+    ret = nvs_flash_init();
+    if (ret == ESP_ERR_NVS_NO_FREE_PAGES ||
+        ret == ESP_ERR_NVS_NEW_VERSION_FOUND) {
+      ESP_ERROR_CHECK(nvs_flash_erase());
+      ret = nvs_flash_init();
+    }
+    ESP_ERROR_CHECK(ret);
+}
+
 void app_main(void)
 {
     board_power_latch();
     st7789vw_init_spi();
     touch_init_i2c();
     st7789vw_set_brightness(get_brightness_level());
+    storage_nvs_init();
 
     ESP_ERROR_CHECK(app_lvgl_init());
 
     battery_adc_init();
+    bluedroid_init_ble_gatt();
+    bt_cmds_register();
 
     if (lvgl_port_lock(0)) {
         ui_init();
         lvgl_port_unlock();
     }
-    xTaskCreatePinnedToCore(battery_task, "battery_task", 2048, NULL, 3, &battery_task_handle, 0);
-    xTaskCreatePinnedToCore(eez_flow_task, "eez_flow_task", 3072, NULL, 4, &eez_flow_task_handle, 1);
+    xTaskCreatePinnedToCore(battery_task, "battery_task", 2048, NULL, 2, &battery_task_handle, 0);
+    xTaskCreatePinnedToCore(eez_flow_task, "eez_flow_task", 2048, NULL, 3, &eez_flow_task_handle, 1);
 }

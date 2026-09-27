@@ -1,8 +1,8 @@
 {
   "navigation": {
-    "selectedUserPageObject": "[Rave-Watch.eez-project]:/userPages/0",
+    "selectedUserPageObject": "[Rave-Watch.eez-project]:/userPages/1",
     "selectedGlobalVariableObject": "[Rave-Watch.eez-project]:/variables/globalVariables/0",
-    "selectedBitmapObject": "[Rave-Watch.eez-project]:/bitmaps/1",
+    "selectedBitmapObject": "[Rave-Watch.eez-project]:/bitmaps/7",
     "subnavigationSelectedItems": {
       "variables-tab/sub-navigation/selected-item": "Global"
     }
@@ -82,6 +82,7 @@
           {
             "type": "border",
             "selected": 0,
+            "size": 103.5,
             "location": "bottom",
             "children": [
               {
@@ -205,12 +206,23 @@
               "children": [
                 {
                   "type": "tab",
-                  "id": "#7b4b7936-fecc-4923-a0da-c9128019c7b8",
-                  "name": "Main",
+                  "id": "#d66c2a37-76ea-4384-b80f-e60a07c06608",
+                  "name": "SettingsPage",
                   "component": "editor",
                   "config": {
-                    "objectPath": "[Rave-Watch.eez-project]:/userPages/0",
+                    "objectPath": "[Rave-Watch.eez-project]:/userPages/1",
                     "permanent": false
+                  },
+                  "icon": "svg:page"
+                },
+                {
+                  "type": "tab",
+                  "id": "#a18af4a1-d3db-4572-b688-2ca7379ea680",
+                  "name": "DrawerPage",
+                  "component": "editor",
+                  "config": {
+                    "objectPath": "[Rave-Watch.eez-project]:/userPages/2",
+                    "permanent": true
                   },
                   "icon": "svg:page"
                 },
@@ -237,7 +249,7 @@
                 {
                   "type": "tabset",
                   "id": "#759367d0-58da-4c1d-ba63-921c5d1b9185",
-                  "weight": 2,
+                  "weight": 2.0601503759398496,
                   "children": [
                     {
                       "type": "tab",
@@ -252,7 +264,7 @@
                 {
                   "type": "tabset",
                   "id": "#f9735de3-cfeb-4e4a-9b9f-64f6de0dc7d6",
-                  "weight": 1,
+                  "weight": 0.9398496240601504,
                   "children": [
                     {
                       "type": "tab",
@@ -1096,7 +1108,8 @@
               "0": {}
             },
             "1": {},
-            "2": {}
+            "2": {},
+            "3": {}
           }
         }
       },
@@ -1119,13 +1132,19 @@
       "selectionBack": {
         "0": {
           "0": {},
-          "1": {}
+          "1": {},
+          "2": {},
+          "3": {
+            "0": {
+              "$selected": true
+            }
+          }
         }
       },
       "transform": {
         "translate": {
-          "x": -270.9453125,
-          "y": -264.9296875
+          "x": -79.74609375,
+          "y": -225.375
         },
         "scale": 1.25
       },
@@ -1140,7 +1159,35 @@
       "selectionFront": {},
       "selectionBack": {
         "0": {
-          "0": {}
+          "0": {
+            "$selected": true
+          }
+        }
+      },
+      "transform": {
+        "translate": {
+          "x": -120,
+          "y": -140
+        },
+        "scale": 1.25
+      },
+      "timeline": {
+        "isEditorActive": false,
+        "position": 0,
+        "secondToPx": 200,
+        "scrollLeft": 0
+      }
+    },
+    "[Rave-Watch.eez-project]:/userPages/3[flow-state]": {
+      "selectionFront": {},
+      "selectionBack": {
+        "0": {
+          "0": {
+            "0": {}
+          },
+          "1": {
+            "$selected": true
+          }
         }
       },
       "transform": {
@@ -1173,15 +1220,12 @@
   "lvglPart": "MAIN",
   "lvglState": "DEFAULT",
   "lvglExpandedPropertiesGroup": [
-    "BACKGROUND",
-    "MARGIN",
     "MISCELLANEOUS",
-    "BORDER",
     "TEXT"
   ],
   "showInactiveFlowsInDebugger": true,
   "globalFlowZoom": true,
   "flowZoom": 1.25,
   "implementationLanguage": "C",
-  "openDialogDefaultPath": "/home/peppe289/Downloads/home_24dp_E3E3E3_FILL0_wght400_GRAD0_opsz24.png"
+  "openDialogDefaultPath": "/home/peppe289/Downloads/bluetooth_disabled_24dp_E3E3E3_FILL0_wght400_GRAD0_opsz24.png"
 }

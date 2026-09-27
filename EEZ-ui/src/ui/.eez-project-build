@@ -15,10 +15,14 @@
     "styles.h",
     "ui.c",
     "ui.h",
+    "ui_image_backward_bit_map.c",
+    "ui_image_bluetooth_bit_map.c",
+    "ui_image_bluetooth_disabled_bit_map.c",
     "ui_image_grid_view_bit_map.c",
     "ui_image_home_bit_map.c",
     "ui_image_settings_bit_map.c",
     "ui_image_suspend_bit_map.c",
+    "ui_image_wifi_bit_map.c",
     "vars.h"
   ]
 }
