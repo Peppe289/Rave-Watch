@@ -246,6 +246,22 @@ static void storage_nvs_init() {
     ESP_ERROR_CHECK(ret);
 }
 
+// TODO: implement as well this part
+#include <string.h>
+#include "vars.h"
+
+char digital_clock[100] = { '0', '9',':','1','2', 0 };
+
+const char *get_var_digital_clock() {
+    return digital_clock;
+}
+
+void set_var_digital_clock(const char *value) {
+    strncpy(digital_clock, value, sizeof(digital_clock) / sizeof(char));
+    digital_clock[sizeof(digital_clock) / sizeof(char) - 1] = 0;
+}
+// ------------------------------------------------------------------------------------
+
 void app_main(void)
 {
     board_power_latch();

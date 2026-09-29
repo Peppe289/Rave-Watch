@@ -17,6 +17,11 @@ lv_style_t *get_style_secondary_container_MAIN_DEFAULT();
 void add_style_secondary_container(lv_obj_t *obj);
 void remove_style_secondary_container(lv_obj_t *obj);
 
+// Style: ClockStyle
+lv_style_t *get_style_clock_style_MAIN_DEFAULT();
+void add_style_clock_style(lv_obj_t *obj);
+void remove_style_clock_style(lv_obj_t *obj);
+
 #ifdef __cplusplus
 }
 #endif

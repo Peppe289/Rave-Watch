@@ -117,6 +117,15 @@
         "defaultValue": "\"\"",
         "persistent": false,
         "native": true
+      },
+      {
+        "objID": "bc43449c-aeae-41b4-a8e7-ae063994bdf0",
+        "name": "digital_clock",
+        "type": "string",
+        "size": null,
+        "defaultValue": "\"09:12\"",
+        "persistent": false,
+        "native": true
       }
     ],
     "structures": [],
@@ -641,6 +650,53 @@
               },
               "group": "",
               "groupIndex": 0
+            },
+            {
+              "objID": "75b1b511-ea4a-4014-f6e3-d7970e5e78da",
+              "type": "LVGLTextareaWidget",
+              "left": 10,
+              "top": 85,
+              "width": 221,
+              "height": 75,
+              "customInputs": [],
+              "customOutputs": [],
+              "style": {
+                "objID": "d2d0dc17-e016-4373-dbbe-ef1360c24806",
+                "useStyle": "default",
+                "conditionalStyles": [],
+                "childStyles": []
+              },
+              "timeline": [],
+              "eventHandlers": [],
+              "leftUnit": "px",
+              "topUnit": "px",
+              "widthUnit": "px",
+              "heightUnit": "px",
+              "children": [],
+              "widgetFlags": "CLICK_FOCUSABLE|GESTURE_BUBBLE|PRESS_LOCK|SCROLLABLE|SCROLL_CHAIN_HOR|SCROLL_CHAIN_VER|SCROLL_ELASTIC|SCROLL_MOMENTUM|SCROLL_ON_FOCUS|SCROLL_WITH_ARROW|SNAPPABLE",
+              "hiddenFlagType": "literal",
+              "clickableFlag": true,
+              "clickableFlagType": "literal",
+              "flagScrollbarMode": "",
+              "flagScrollDirection": "",
+              "scrollSnapX": "",
+              "scrollSnapY": "",
+              "checkedStateType": "literal",
+              "disabledStateType": "literal",
+              "states": "",
+              "useStyle": "ClockStyle",
+              "localStyles": {
+                "objID": "b185abbd-61b4-4f00-de74-7678c87af553"
+              },
+              "group": "",
+              "groupIndex": 0,
+              "text": "digital_clock",
+              "textType": "expression",
+              "placeholder": "",
+              "oneLineMode": false,
+              "passwordMode": false,
+              "acceptedCharacters": "",
+              "maxTextLength": 128
             }
           ],
           "widgetFlags": "CLICKABLE|PRESS_LOCK|CLICK_FOCUSABLE|GESTURE_BUBBLE|SNAPPABLE|SCROLLABLE|SCROLL_ELASTIC|SCROLL_MOMENTUM|SCROLL_CHAIN_HOR|SCROLL_CHAIN_VER",
@@ -1440,6 +1496,28 @@
                 "bg_color": "#00407C",
                 "bg_opa": 255,
                 "radius": 10
+              }
+            }
+          }
+        }
+      },
+      {
+        "objID": "eef81a92-04cf-466d-afaa-29abf458e40b",
+        "name": "ClockStyle",
+        "forWidgetType": "LVGLTextareaWidget",
+        "childStyles": [],
+        "definition": {
+          "objID": "9b329318-0c42-4071-a4a8-1835cbe47af5",
+          "definition": {
+            "MAIN": {
+              "DEFAULT": {
+                "bg_color": "#000000",
+                "border_color": "#000000",
+                "border_opa": 0,
+                "text_color": "#FFFFFF",
+                "text_opa": 255,
+                "text_font": "MONTSERRAT_48",
+                "text_align": "CENTER"
               }
             }
           }
