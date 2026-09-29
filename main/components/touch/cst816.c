@@ -1,15 +1,28 @@
-#include "driver/i2c.h"
 #include "driver/gpio.h"
+#include "i2cdev.h"
 #include "cst816.h"
+
+static i2c_dev_t s_cst816 = {
+    .port = TOUCH_I2C_NUM,
+    .addr = CST816_I2C_ADDR,
+    .addr_bit_len = I2C_ADDR_BIT_LEN_7,
+    .cfg = {
+        .sda_io_num = PIN_TOUCH_SDA,
+        .scl_io_num = PIN_TOUCH_SCL,
+        .sda_pullup_en = 1,
+        .scl_pullup_en = 1,
+        .master = {
+            .clk_speed = 400000,
+        },
+    },
+};
 
 static uint16_t last_x = 0;
 static uint16_t last_y = 0;
 static bool last_pressed = false;
 
 static esp_err_t cst816_read_raw(uint8_t *data, size_t len) {
-    uint8_t reg = 0x01;
-    return i2c_master_write_read_device(TOUCH_I2C_NUM, CST816_I2C_ADDR, 
-                                        &reg, 1, data, len, pdMS_TO_TICKS(50));
+    return i2c_dev_read_reg(&s_cst816, 0x01, data, len);
 }
 
 void touch_init_i2c(void) {
@@ -28,16 +41,7 @@ void touch_init_i2c(void) {
         vTaskDelay(pdMS_TO_TICKS(50));
     }
 
-    i2c_config_t conf = {
-        .mode = I2C_MODE_MASTER,
-        .sda_io_num = PIN_TOUCH_SDA,
-        .sda_pullup_en = GPIO_PULLUP_ENABLE,
-        .scl_io_num = PIN_TOUCH_SCL,
-        .scl_pullup_en = GPIO_PULLUP_ENABLE,
-        .master.clk_speed = 400000,
-    };
-    ESP_ERROR_CHECK(i2c_param_config(TOUCH_I2C_NUM, &conf));
-    ESP_ERROR_CHECK(i2c_driver_install(TOUCH_I2C_NUM, conf.mode, 0, 0, 0));
+    ESP_ERROR_CHECK(i2c_dev_create_mutex(&s_cst816));
 }
 
 bool cst816_is_pressed(void) {

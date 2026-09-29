@@ -25,6 +25,8 @@
 #include "ui.h"
 #include "screens.h"
 
+#include <qmi8658c.h>
+
 static const char *TAG = "main";
 
 static bool s_suspend_display = false;
@@ -266,6 +268,7 @@ void app_main(void)
 {
     board_power_latch();
     st7789vw_init_spi();
+    ESP_ERROR_CHECK(i2cdev_init());
     touch_init_i2c();
     st7789vw_set_brightness(get_brightness_level());
     storage_nvs_init();
