@@ -40,7 +40,7 @@ void remove_style_primary_container(lv_obj_t *obj) {
 //
 
 void init_style_secondary_container_MAIN_DEFAULT(lv_style_t *style) {
-    lv_style_set_bg_color(style, lv_color_hex(0xb1858f));
+    lv_style_set_bg_color(style, lv_color_hex(0x00407c));
     lv_style_set_bg_opa(style, 255);
     lv_style_set_radius(style, 10);
 };

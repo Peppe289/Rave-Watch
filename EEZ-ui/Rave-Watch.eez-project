@@ -205,9 +205,9 @@
                 {
                   "objID": "6c423013-53fd-41e8-eb51-a522a2303f33",
                   "type": "LVGLContainerWidget",
-                  "left": 94,
+                  "left": 83,
                   "top": 220,
-                  "width": 52,
+                  "width": 75,
                   "height": 52,
                   "customInputs": [],
                   "customOutputs": [],
@@ -236,7 +236,7 @@
                     {
                       "objID": "7671d62c-4121-4206-d15e-89cbeee87af4",
                       "type": "LVGLImageWidget",
-                      "left": 14,
+                      "left": 26,
                       "top": 14,
                       "width": 24,
                       "height": 24,
@@ -416,7 +416,7 @@
                   "type": "LVGLContainerWidget",
                   "left": 10,
                   "top": 220,
-                  "width": 52,
+                  "width": 67,
                   "height": 52,
                   "customInputs": [],
                   "customOutputs": [],
@@ -444,7 +444,7 @@
                     {
                       "objID": "293292f8-1a3c-422d-b12e-5e891071d83e",
                       "type": "LVGLImageWidget",
-                      "left": 14,
+                      "left": 22,
                       "top": 14,
                       "width": 24,
                       "height": 24,
@@ -520,9 +520,9 @@
                 {
                   "objID": "0089326f-36a6-4431-9197-b30f6089a4e5",
                   "type": "LVGLContainerWidget",
-                  "left": 178,
+                  "left": 164,
                   "top": 220,
-                  "width": 52,
+                  "width": 67,
                   "height": 52,
                   "customInputs": [],
                   "customOutputs": [],
@@ -550,7 +550,7 @@
                     {
                       "objID": "06e1126a-c7ae-4f6a-9e24-94fc694ac42f",
                       "type": "LVGLImageWidget",
-                      "left": 14,
+                      "left": 22,
                       "top": 14,
                       "width": 24,
                       "height": 24,
@@ -871,9 +871,9 @@
             {
               "objID": "10a1729e-a0ca-4971-b430-422136dec4cf",
               "type": "LVGLContainerWidget",
-              "left": 94,
+              "left": 19,
               "top": 220,
-              "width": 52,
+              "width": 202,
               "height": 52,
               "customInputs": [],
               "customOutputs": [],
@@ -901,7 +901,7 @@
                 {
                   "objID": "bee5da52-f798-4f70-9296-cf353a4d20db",
                   "type": "LVGLImageWidget",
-                  "left": 14,
+                  "left": 89,
                   "top": 14,
                   "width": 24,
                   "height": 24,
@@ -1232,9 +1232,9 @@
             {
               "objID": "d0018c50-a7de-400f-996b-7babd77f79f6",
               "type": "LVGLContainerWidget",
-              "left": 94,
+              "left": 19,
               "top": 220,
-              "width": 52,
+              "width": 202,
               "height": 52,
               "customInputs": [],
               "customOutputs": [],
@@ -1262,7 +1262,7 @@
                 {
                   "objID": "60922910-c6dd-46a8-fae2-75eda43d2f02",
                   "type": "LVGLImageWidget",
-                  "left": 14,
+                  "left": 89,
                   "top": 14,
                   "width": 24,
                   "height": 24,
@@ -1437,7 +1437,7 @@
           "definition": {
             "MAIN": {
               "DEFAULT": {
-                "bg_color": "#B1858F",
+                "bg_color": "#00407C",
                 "bg_opa": 255,
                 "radius": 10
               }
