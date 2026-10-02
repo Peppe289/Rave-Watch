@@ -1,12 +1,29 @@
+
+#include <string.h>
+#include "vars.h"
+#include "widgets/lv_img.h"
+#include "images.h"
+#include "screens.h"
+
 #include "hal/adc_types.h"
 
 #include "esp_adc/adc_oneshot.h"
 #include "esp_adc/adc_cali.h"
 #include "esp_adc/adc_cali_scheme.h"
-#include "voltage.h"
+#include "battery.h"
 
 static adc_oneshot_unit_handle_t adc1_handle = NULL;
 static adc_cali_handle_t adc_cali_handle = NULL;
+
+void battery_set_ui_state(battery_state_enum state) {
+    if (objects.battery_status != NULL) {
+        if (state == BATTERY_HIGH )
+            lv_img_set_src(objects.battery_status, &img_battery_full_bit_map);
+        else if (state == BATTERY_MEDIUM)
+            lv_img_set_src(objects.battery_status, &img_battery_50_bit_map);
+        else lv_img_set_src(objects.battery_status, &img_battery_low_bit_map);
+    }
+}
 
 void battery_adc_init(void) {
     adc_oneshot_unit_init_cfg_t init_config = {

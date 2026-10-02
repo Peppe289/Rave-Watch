@@ -20,7 +20,7 @@
 #include "brightness.h"
 #include "pwr_button.h"
 #include "cst816.h"
-#include "voltage.h"
+#include "battery.h"
 #include "lvgl.h"
 #include "ui.h"
 #include "screens.h"
@@ -63,18 +63,17 @@ static void touch_read_cb(lv_indev_drv_t *indev_drv, lv_indev_data_t *data) {
 }
 
 static void battery_task(void *arg) {
-    char voltage_str[16];
-
+    static uint32_t voltage_mv;
     while (1) {
-        uint32_t voltage_mv = battery_get_voltage_mv();
-        snprintf(voltage_str, sizeof(voltage_str), "%.2f V", voltage_mv / 1000.0f);
+        voltage_mv = battery_get_voltage_mv();
+        if (voltage_mv >= 40 * 100) battery_set_ui_state(3);
+        else if (voltage_mv < 40 * 100 && voltage_mv >= 35 * 100) battery_set_ui_state(2);
+        else if (voltage_mv <= 34 * 100) battery_set_ui_state(1);
 
-        if (lvgl_port_lock(0)) {
-            set_var_battery_voltage(voltage_str);
+        if (lvgl_port_lock(0))
             lvgl_port_unlock();
-        }
 
-        vTaskDelay(pdMS_TO_TICKS(1000));
+        vTaskDelay(pdMS_TO_TICKS(10000));
     }
 }
 

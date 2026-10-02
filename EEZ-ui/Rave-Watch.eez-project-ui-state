@@ -1,7 +1,8 @@
 {
   "navigation": {
-    "selectedUserPageObject": "[Rave-Watch.eez-project]:/userPages/1",
-    "selectedGlobalVariableObject": "[Rave-Watch.eez-project]:/variables/globalVariables/0",
+    "selectedUserPageObject": "[Rave-Watch.eez-project]:/userPages/0",
+    "selectedGlobalVariableObject": "[Rave-Watch.eez-project]:/variables/globalVariables/1",
+    "selectedStyleObject": "[Rave-Watch.eez-project]:/lvglStyles/styles/2",
     "selectedBitmapObject": "[Rave-Watch.eez-project]:/bitmaps/7",
     "subnavigationSelectedItems": {
       "variables-tab/sub-navigation/selected-item": "Global"
@@ -25,7 +26,7 @@
           },
           {
             "type": "border",
-            "selected": 2,
+            "selected": 0,
             "size": 240,
             "location": "right",
             "children": [
@@ -207,10 +208,10 @@
                 {
                   "type": "tab",
                   "id": "#d66c2a37-76ea-4384-b80f-e60a07c06608",
-                  "name": "SettingsPage",
+                  "name": "Main",
                   "component": "editor",
                   "config": {
-                    "objectPath": "[Rave-Watch.eez-project]:/userPages/1",
+                    "objectPath": "[Rave-Watch.eez-project]:/userPages/0",
                     "permanent": false
                   },
                   "icon": "svg:page"
@@ -890,7 +891,8 @@
                       "component": "styles",
                       "enableClose": false
                     }
-                  ]
+                  ],
+                  "active": true
                 },
                 {
                   "type": "tabset",
@@ -1110,15 +1112,16 @@
             "1": {},
             "2": {},
             "3": {}
-          }
+          },
+          "1": {}
         }
       },
       "transform": {
         "translate": {
-          "x": -109.9299235357305,
-          "y": -156.9551776510441
+          "x": -116.87915860430002,
+          "y": -171.78457419006162
         },
-        "scale": 1.25
+        "scale": 1.1
       },
       "timeline": {
         "isEditorActive": false,
@@ -1132,21 +1135,20 @@
       "selectionBack": {
         "0": {
           "0": {},
-          "1": {},
-          "2": {},
+          "1": {
+            "$selected": true
+          },
           "3": {
-            "0": {
-              "$selected": true
-            }
+            "0": {}
           }
         }
       },
       "transform": {
         "translate": {
-          "x": -79.74609375,
-          "y": -225.375
+          "x": -63.472139136904765,
+          "y": -35.89107142857145
         },
-        "scale": 1.25
+        "scale": 1.1
       },
       "timeline": {
         "isEditorActive": false,
@@ -1159,17 +1161,15 @@
       "selectionFront": {},
       "selectionBack": {
         "0": {
-          "0": {
-            "$selected": true
-          }
+          "0": {}
         }
       },
       "transform": {
         "translate": {
-          "x": -120,
-          "y": -140
+          "x": -114.70880681818176,
+          "y": -146.81392045454538
         },
-        "scale": 1.25
+        "scale": 1.1
       },
       "timeline": {
         "isEditorActive": false,
@@ -1203,6 +1203,11 @@
         "secondToPx": 200,
         "scrollLeft": 0
       }
+    },
+    "[Rave-Watch.eez-project]:/lvglStyles/styles[tree-state]": {
+      "0": {},
+      "1": {},
+      "2": {}
     }
   },
   "activeOutputSection": 0,
@@ -1221,11 +1226,13 @@
   "lvglState": "DEFAULT",
   "lvglExpandedPropertiesGroup": [
     "MISCELLANEOUS",
-    "TEXT"
+    "TEXT",
+    "BACKGROUND",
+    "BORDER"
   ],
   "showInactiveFlowsInDebugger": true,
   "globalFlowZoom": true,
-  "flowZoom": 1.25,
+  "flowZoom": 1.1,
   "implementationLanguage": "C",
   "openDialogDefaultPath": "/home/peppe289/Downloads/bluetooth_disabled_24dp_E3E3E3_FILL0_wght400_GRAD0_opsz24.png"
 }
