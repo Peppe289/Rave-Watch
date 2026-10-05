@@ -644,10 +644,10 @@
             {
               "objID": "75b1b511-ea4a-4014-f6e3-d7970e5e78da",
               "type": "LVGLTextareaWidget",
-              "left": 10,
-              "top": 85,
-              "width": 154,
-              "height": 75,
+              "left": 56,
+              "top": 61,
+              "width": 108,
+              "height": 129,
               "customInputs": [],
               "customOutputs": [],
               "style": {
@@ -698,8 +698,8 @@
             {
               "objID": "e66335f2-d96b-4f9c-ab1b-473d1d98ee01",
               "type": "LVGLTextareaWidget",
-              "left": 163,
-              "top": 96,
+              "left": 158,
+              "top": 125,
               "width": 67,
               "height": 54,
               "customInputs": [],

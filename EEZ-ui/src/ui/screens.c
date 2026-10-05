@@ -263,8 +263,8 @@ void create_screen_main() {
         {
             lv_obj_t *obj = lv_textarea_create(parent_obj);
             objects.obj0 = obj;
-            lv_obj_set_pos(obj, 10, 85);
-            lv_obj_set_size(obj, 154, 75);
+            lv_obj_set_pos(obj, 56, 61);
+            lv_obj_set_size(obj, 108, 129);
             lv_textarea_set_max_length(obj, 128);
             lv_textarea_set_one_line(obj, false);
             lv_textarea_set_password_mode(obj, false);
@@ -275,7 +275,7 @@ void create_screen_main() {
         {
             lv_obj_t *obj = lv_textarea_create(parent_obj);
             objects.obj1 = obj;
-            lv_obj_set_pos(obj, 163, 96);
+            lv_obj_set_pos(obj, 158, 125);
             lv_obj_set_size(obj, 67, 54);
             lv_textarea_set_max_length(obj, 128);
             lv_textarea_set_one_line(obj, false);

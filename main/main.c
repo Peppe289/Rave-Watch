@@ -126,9 +126,9 @@ static void clock_update_task(void *arg) {
             }
 
             char clock_str[9];
-            snprintf(clock_str, sizeof(clock_str), "%02u:%02u", hours, minutes);
+            snprintf(clock_str, sizeof(clock_str), "%02u\n%02u", hours, minutes);
             set_var_digital_clock(clock_str);
-            snprintf(clock_str, sizeof(clock_str), "%02u", seconds);
+            snprintf(clock_str, sizeof(clock_str), ":%02u", seconds);
             set_var_digital_clock_seconds(clock_str);
         }
     }
