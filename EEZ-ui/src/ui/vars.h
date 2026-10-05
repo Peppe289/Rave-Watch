@@ -20,6 +20,8 @@ enum FlowGlobalVariables {
 
 extern const char *get_var_digital_clock();
 extern void set_var_digital_clock(const char *value);
+extern const char *get_var_digital_clock_seconds();
+extern void set_var_digital_clock_seconds(const char *value);
 
 #ifdef __cplusplus
 }

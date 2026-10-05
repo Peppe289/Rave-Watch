@@ -111,19 +111,20 @@
     "objID": "c6c71e16-53e1-217f-d03b-cef56c6b037a",
     "globalVariables": [
       {
-        "objID": "ca2d8260-abbb-43a7-c2b1-78806df29ce4",
-        "name": "battery_voltage",
-        "type": "string",
-        "defaultValue": "\"\"",
-        "persistent": false,
-        "native": true
-      },
-      {
         "objID": "bc43449c-aeae-41b4-a8e7-ae063994bdf0",
         "name": "digital_clock",
         "type": "string",
         "size": null,
         "defaultValue": "\"09:12\"",
+        "persistent": false,
+        "native": true
+      },
+      {
+        "objID": "a8b8a85c-8d24-41f3-8787-b240a5f40b36",
+        "name": "digital_clock_seconds",
+        "type": "string",
+        "size": null,
+        "defaultValue": "\"\"",
         "persistent": false,
         "native": true
       }
@@ -342,31 +343,30 @@
                   "heightUnit": "px",
                   "children": [
                     {
-                      "objID": "5771348f-8f9b-4abe-ce1b-a5a36943ba35",
-                      "type": "LVGLTextareaWidget",
-                      "left": 109,
-                      "top": 4,
-                      "width": 45,
-                      "height": 31,
+                      "objID": "0a28254c-0ee5-41e4-f305-3b74e7fb70b1",
+                      "type": "LVGLImageWidget",
+                      "left": 196,
+                      "top": 2,
+                      "width": 35,
+                      "height": 35,
                       "customInputs": [],
                       "customOutputs": [],
                       "style": {
-                        "objID": "1139ae20-e4aa-48cc-a42e-79b8e11826ce",
+                        "objID": "d4b117e6-1658-473a-984f-465d60a68dd7",
                         "useStyle": "default",
                         "conditionalStyles": [],
                         "childStyles": []
                       },
                       "timeline": [],
                       "eventHandlers": [],
-                      "identifier": "txtBatteryVoltage",
+                      "identifier": "battery_status",
                       "leftUnit": "px",
                       "topUnit": "px",
-                      "widthUnit": "px",
-                      "heightUnit": "px",
+                      "widthUnit": "content",
+                      "heightUnit": "content",
                       "children": [],
-                      "widgetFlags": "GESTURE_BUBBLE|PRESS_LOCK",
+                      "widgetFlags": "ADV_HITTEST|CLICK_FOCUSABLE|GESTURE_BUBBLE|PRESS_LOCK|SCROLLABLE|SCROLL_CHAIN_HOR|SCROLL_CHAIN_VER|SCROLL_ELASTIC|SCROLL_MOMENTUM|SCROLL_WITH_ARROW|SNAPPABLE",
                       "hiddenFlagType": "literal",
-                      "clickableFlag": false,
                       "clickableFlagType": "literal",
                       "flagScrollbarMode": "",
                       "flagScrollDirection": "",
@@ -376,31 +376,21 @@
                       "disabledStateType": "literal",
                       "states": "",
                       "localStyles": {
-                        "objID": "e05d208e-6713-4168-b117-a98efd080377",
-                        "definition": {
-                          "MAIN": {
-                            "DEFAULT": {
-                              "bg_color": "#aca8fa",
-                              "bg_opa": 0,
-                              "border_opa": 0,
-                              "border_width": 0,
-                              "text_color": "#E3E3E3",
-                              "text_font": "MONTSERRAT_14",
-                              "text_opa": 255,
-                              "text_align": "CENTER"
-                            }
-                          }
-                        }
+                        "objID": "efd7a1d5-b696-46a6-bf28-a001b4fdfcd3"
                       },
                       "group": "",
                       "groupIndex": 0,
-                      "text": "battery_voltage",
-                      "textType": "expression",
-                      "placeholder": "",
-                      "oneLineMode": false,
-                      "passwordMode": false,
-                      "acceptedCharacters": "",
-                      "maxTextLength": 20
+                      "image": "Battery_Full_BitMap",
+                      "setPivot": false,
+                      "pivotX": 0,
+                      "pivotY": 0,
+                      "zoom": 256,
+                      "angle": 0,
+                      "innerAlign": "CENTER",
+                      "sizeMode": "VIRTUAL",
+                      "value": 0,
+                      "valueType": "literal",
+                      "previewValue": 0
                     }
                   ],
                   "widgetFlags": "CLICK_FOCUSABLE|GESTURE_BUBBLE|PRESS_LOCK|SCROLLABLE|SCROLL_CHAIN_HOR|SCROLL_CHAIN_VER|SCROLL_ELASTIC|SCROLL_MOMENTUM|SCROLL_WITH_ARROW|SNAPPABLE",
@@ -656,7 +646,7 @@
               "type": "LVGLTextareaWidget",
               "left": 10,
               "top": 85,
-              "width": 221,
+              "width": 154,
               "height": 75,
               "customInputs": [],
               "customOutputs": [],
@@ -686,7 +676,14 @@
               "states": "",
               "useStyle": "ClockStyle",
               "localStyles": {
-                "objID": "b185abbd-61b4-4f00-de74-7678c87af553"
+                "objID": "b185abbd-61b4-4f00-de74-7678c87af553",
+                "definition": {
+                  "MAIN": {
+                    "DEFAULT": {
+                      "text_align": "RIGHT"
+                    }
+                  }
+                }
               },
               "group": "",
               "groupIndex": 0,
@@ -699,30 +696,30 @@
               "maxTextLength": 128
             },
             {
-              "objID": "0a28254c-0ee5-41e4-f305-3b74e7fb70b1",
-              "type": "LVGLImageWidget",
-              "left": 196,
-              "top": 2,
-              "width": 35,
-              "height": 35,
+              "objID": "e66335f2-d96b-4f9c-ab1b-473d1d98ee01",
+              "type": "LVGLTextareaWidget",
+              "left": 163,
+              "top": 96,
+              "width": 67,
+              "height": 54,
               "customInputs": [],
               "customOutputs": [],
               "style": {
-                "objID": "d4b117e6-1658-473a-984f-465d60a68dd7",
+                "objID": "433e90e8-60e5-4739-f381-2f884fe08cb5",
                 "useStyle": "default",
                 "conditionalStyles": [],
                 "childStyles": []
               },
               "timeline": [],
               "eventHandlers": [],
-              "identifier": "battery_status",
               "leftUnit": "px",
               "topUnit": "px",
-              "widthUnit": "content",
-              "heightUnit": "content",
+              "widthUnit": "px",
+              "heightUnit": "px",
               "children": [],
-              "widgetFlags": "ADV_HITTEST|CLICK_FOCUSABLE|GESTURE_BUBBLE|PRESS_LOCK|SCROLLABLE|SCROLL_CHAIN_HOR|SCROLL_CHAIN_VER|SCROLL_ELASTIC|SCROLL_MOMENTUM|SCROLL_WITH_ARROW|SNAPPABLE",
+              "widgetFlags": "CLICK_FOCUSABLE|GESTURE_BUBBLE|PRESS_LOCK|SCROLLABLE|SCROLL_CHAIN_HOR|SCROLL_CHAIN_VER|SCROLL_ELASTIC|SCROLL_MOMENTUM|SCROLL_ON_FOCUS|SCROLL_WITH_ARROW|SNAPPABLE",
               "hiddenFlagType": "literal",
+              "clickableFlag": true,
               "clickableFlagType": "literal",
               "flagScrollbarMode": "",
               "flagScrollDirection": "",
@@ -732,21 +729,28 @@
               "disabledStateType": "literal",
               "states": "",
               "localStyles": {
-                "objID": "efd7a1d5-b696-46a6-bf28-a001b4fdfcd3"
+                "objID": "9be0dd15-1581-4a2b-9cb7-bced23977e4b",
+                "definition": {
+                  "MAIN": {
+                    "DEFAULT": {
+                      "bg_opa": 0,
+                      "border_opa": 0,
+                      "text_font": "MONTSERRAT_30",
+                      "text_color": "#CACACA",
+                      "text_align": "LEFT"
+                    }
+                  }
+                }
               },
               "group": "",
               "groupIndex": 0,
-              "image": "Battery_Full_BitMap",
-              "setPivot": false,
-              "pivotX": 0,
-              "pivotY": 0,
-              "zoom": 256,
-              "angle": 0,
-              "innerAlign": "CENTER",
-              "sizeMode": "VIRTUAL",
-              "value": 0,
-              "valueType": "literal",
-              "previewValue": 0
+              "text": "digital_clock_seconds",
+              "textType": "expression",
+              "placeholder": "",
+              "oneLineMode": false,
+              "passwordMode": false,
+              "acceptedCharacters": "",
+              "maxTextLength": 128
             }
           ],
           "widgetFlags": "CLICKABLE|PRESS_LOCK|CLICK_FOCUSABLE|GESTURE_BUBBLE|SNAPPABLE|SCROLLABLE|SCROLL_ELASTIC|SCROLL_MOMENTUM|SCROLL_CHAIN_HOR|SCROLL_CHAIN_VER",

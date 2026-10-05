@@ -1,3 +1,5 @@
+#include <i2cdev.h>
+#include <stdint.h>
 #include <stdio.h>
 #include <stdlib.h>
 
@@ -14,6 +16,8 @@
 #include "esp_lcd_panel_ops.h"
 #include "esp_lvgl_port.h"
 #include "nvs_flash.h"
+#include <string.h>
+#include "vars.h"
 #include "bt.h"
 //#include "wifi.h"
 #include "st7789v2.h"
@@ -24,6 +28,7 @@
 #include "lvgl.h"
 #include "ui.h"
 #include "screens.h"
+#include "rtc.h"
 
 #include <qmi8658c.h>
 
@@ -45,6 +50,28 @@ static lv_display_t *lvgl_disp = NULL;
 #else
 static lv_disp_t *lvgl_disp = NULL;
 #endif
+
+char digital_clock[100] = { '0', '9',':','1','2', 0 };
+
+const char *get_var_digital_clock() {
+    return digital_clock;
+}
+
+void set_var_digital_clock(const char *value) {
+    strncpy(digital_clock, value, sizeof(digital_clock) / sizeof(char));
+    digital_clock[sizeof(digital_clock) / sizeof(char) - 1] = 0;
+}
+
+char digital_clock_seconds[100] = { 0 };
+
+const char *get_var_digital_clock_seconds() {
+    return digital_clock_seconds;
+}
+
+void set_var_digital_clock_seconds(const char *value) {
+    strncpy(digital_clock_seconds, value, sizeof(digital_clock_seconds) / sizeof(char));
+    digital_clock_seconds[sizeof(digital_clock_seconds) / sizeof(char) - 1] = 0;
+}
 
 static void touch_read_cb(lv_indev_drv_t *indev_drv, lv_indev_data_t *data) {
     static uint16_t last_x = 0;
@@ -74,6 +101,36 @@ static void battery_task(void *arg) {
             lvgl_port_unlock();
 
         vTaskDelay(pdMS_TO_TICKS(10000));
+    }
+}
+
+static void clock_update_task(void *arg) {
+    while (1) {
+        if (xSemaphoreTake(rtc_get_semaphore(), pdMS_TO_TICKS(1200)) == pdTRUE) {
+            uint8_t data[1] = {0};
+            uint8_t seconds = 0, minutes = 0, hours = 0;
+
+            if (rtc_get_seconds_time(data, sizeof(data)) == ESP_OK) {
+                uint8_t bcd_sec = data[0] & 0x7F;
+                seconds = ((bcd_sec >> 4) * 10) + (bcd_sec & 0x0F);
+            }
+
+            if (rtc_get_minutes_time(data, sizeof(data)) == ESP_OK) {
+                uint8_t bcd_min = data[0] & 0x7F;
+                minutes = ((bcd_min >> 4) * 10) + (bcd_min & 0x0F);
+            }
+
+            if (rtc_get_hours_time(data, sizeof(data)) == ESP_OK) {
+                uint8_t bcd_hr = data[0] & 0x3F;
+                hours = ((bcd_hr >> 4) * 10) + (bcd_hr & 0x0F);
+            }
+
+            char clock_str[9];
+            snprintf(clock_str, sizeof(clock_str), "%02u:%02u", hours, minutes);
+            set_var_digital_clock(clock_str);
+            snprintf(clock_str, sizeof(clock_str), "%02u", seconds);
+            set_var_digital_clock_seconds(clock_str);
+        }
     }
 }
 
@@ -247,22 +304,6 @@ static void storage_nvs_init() {
     ESP_ERROR_CHECK(ret);
 }
 
-// TODO: implement as well this part
-#include <string.h>
-#include "vars.h"
-
-char digital_clock[100] = { '0', '9',':','1','2', 0 };
-
-const char *get_var_digital_clock() {
-    return digital_clock;
-}
-
-void set_var_digital_clock(const char *value) {
-    strncpy(digital_clock, value, sizeof(digital_clock) / sizeof(char));
-    digital_clock[sizeof(digital_clock) / sizeof(char) - 1] = 0;
-}
-// ------------------------------------------------------------------------------------
-
 void app_main(void)
 {
     board_power_latch();
@@ -271,6 +312,7 @@ void app_main(void)
     touch_init_i2c();
     st7789vw_set_brightness(get_brightness_level());
     storage_nvs_init();
+    rtc_init_custom();
 
     ESP_ERROR_CHECK(app_lvgl_init());
 
@@ -282,6 +324,8 @@ void app_main(void)
         ui_init();
         lvgl_port_unlock();
     }
+
+    xTaskCreatePinnedToCore(clock_update_task, "clock_update_task", 2048, NULL, 2, &battery_task_handle, 0);
     xTaskCreatePinnedToCore(battery_task, "battery_task", 2048, NULL, 2, &battery_task_handle, 0);
     xTaskCreatePinnedToCore(eez_flow_task, "eez_flow_task", 2048, NULL, 3, &eez_flow_task_handle, 1);
 }

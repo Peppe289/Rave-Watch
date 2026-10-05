@@ -1,9 +1,9 @@
 {
   "navigation": {
     "selectedUserPageObject": "[Rave-Watch.eez-project]:/userPages/0",
-    "selectedGlobalVariableObject": "[Rave-Watch.eez-project]:/variables/globalVariables/1",
+    "selectedGlobalVariableObject": "[Rave-Watch.eez-project]:/variables/globalVariables/-1",
     "selectedStyleObject": "[Rave-Watch.eez-project]:/lvglStyles/styles/2",
-    "selectedBitmapObject": "[Rave-Watch.eez-project]:/bitmaps/7",
+    "selectedBitmapObject": "[Rave-Watch.eez-project]:/bitmaps/10",
     "subnavigationSelectedItems": {
       "variables-tab/sub-navigation/selected-item": "Global"
     }
@@ -26,7 +26,7 @@
           },
           {
             "type": "border",
-            "selected": 0,
+            "selected": 2,
             "size": 240,
             "location": "right",
             "children": [
@@ -1119,7 +1119,7 @@
       "transform": {
         "translate": {
           "x": -116.87915860430002,
-          "y": -171.78457419006162
+          "y": -51.78457419006162
         },
         "scale": 1.1
       },
@@ -1234,5 +1234,5 @@
   "globalFlowZoom": true,
   "flowZoom": 1.1,
   "implementationLanguage": "C",
-  "openDialogDefaultPath": "/home/peppe289/Downloads/bluetooth_disabled_24dp_E3E3E3_FILL0_wght400_GRAD0_opsz24.png"
+  "openDialogDefaultPath": "/home/peppe289/Downloads/battery_android_frame_4_35dp_E3E3E3_FILL0_wght400_GRAD0_opsz40.png"
 }

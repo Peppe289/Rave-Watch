@@ -13,7 +13,7 @@
 objects_t objects;
 
 static const char *screen_names[] = { "Main", "SettingsPage", "DrawerPage" };
-static const char *object_names[] = { "main", "settings_page", "drawer_page", "btn_suspend", "container_battery_voltage", "battery_status", "btn_settings_page", "btn_app_drawer_page", "obj0", "brightness_slider", "btn_home_page", "obj1", "btn_bt_toggle", "img_bt", "btn_home_drawer_page" };
+static const char *object_names[] = { "main", "settings_page", "drawer_page", "btn_suspend", "container_battery_voltage", "battery_status", "btn_settings_page", "btn_app_drawer_page", "obj0", "obj1", "brightness_slider", "btn_home_page", "obj2", "btn_bt_toggle", "img_bt", "btn_home_drawer_page" };
 
 //
 // Event handlers
@@ -64,6 +64,20 @@ static void event_handler_cb_main_obj0(lv_event_t *e) {
         if (tick_value_change_obj != ta) {
             const char *value = lv_textarea_get_text(ta);
             assignStringProperty(flowState, 10, 3, value, "Failed to assign Text in Textarea widget");
+        }
+    }
+}
+
+static void event_handler_cb_main_obj1(lv_event_t *e) {
+    lv_event_code_t event = lv_event_get_code(e);
+    void *flowState = lv_event_get_user_data(e);
+    (void)flowState;
+    
+    if (event == LV_EVENT_VALUE_CHANGED) {
+        lv_obj_t *ta = lv_event_get_target(e);
+        if (tick_value_change_obj != ta) {
+            const char *value = lv_textarea_get_text(ta);
+            assignStringProperty(flowState, 11, 3, value, "Failed to assign Text in Textarea widget");
         }
     }
 }
@@ -250,12 +264,28 @@ void create_screen_main() {
             lv_obj_t *obj = lv_textarea_create(parent_obj);
             objects.obj0 = obj;
             lv_obj_set_pos(obj, 10, 85);
-            lv_obj_set_size(obj, 221, 75);
+            lv_obj_set_size(obj, 154, 75);
             lv_textarea_set_max_length(obj, 128);
             lv_textarea_set_one_line(obj, false);
             lv_textarea_set_password_mode(obj, false);
             lv_obj_add_event_cb(obj, event_handler_cb_main_obj0, LV_EVENT_ALL, flowState);
             add_style_clock_style(obj);
+            lv_obj_set_style_text_align(obj, LV_TEXT_ALIGN_RIGHT, LV_PART_MAIN | LV_STATE_DEFAULT);
+        }
+        {
+            lv_obj_t *obj = lv_textarea_create(parent_obj);
+            objects.obj1 = obj;
+            lv_obj_set_pos(obj, 163, 96);
+            lv_obj_set_size(obj, 67, 54);
+            lv_textarea_set_max_length(obj, 128);
+            lv_textarea_set_one_line(obj, false);
+            lv_textarea_set_password_mode(obj, false);
+            lv_obj_add_event_cb(obj, event_handler_cb_main_obj1, LV_EVENT_ALL, flowState);
+            lv_obj_set_style_bg_opa(obj, 0, LV_PART_MAIN | LV_STATE_DEFAULT);
+            lv_obj_set_style_border_opa(obj, 0, LV_PART_MAIN | LV_STATE_DEFAULT);
+            lv_obj_set_style_text_font(obj, &lv_font_montserrat_30, LV_PART_MAIN | LV_STATE_DEFAULT);
+            lv_obj_set_style_text_color(obj, lv_color_hex(0xcacaca), LV_PART_MAIN | LV_STATE_DEFAULT);
+            lv_obj_set_style_text_align(obj, LV_TEXT_ALIGN_LEFT, LV_PART_MAIN | LV_STATE_DEFAULT);
         }
     }
     
@@ -272,6 +302,16 @@ void tick_screen_main() {
         if (strncmp(new_val, cur_val, max_length) != 0) {
             tick_value_change_obj = objects.obj0;
             lv_textarea_set_text(objects.obj0, new_val);
+            tick_value_change_obj = NULL;
+        }
+    }
+    {
+        const char *new_val = evalTextProperty(flowState, 11, 3, "Failed to evaluate Text in Textarea widget");
+        const char *cur_val = lv_textarea_get_text(objects.obj1);
+        uint32_t max_length = lv_textarea_get_max_length(objects.obj1);
+        if (strncmp(new_val, cur_val, max_length) != 0) {
+            tick_value_change_obj = objects.obj1;
+            lv_textarea_set_text(objects.obj1, new_val);
             tick_value_change_obj = NULL;
         }
     }
@@ -339,7 +379,7 @@ void create_screen_settings_page() {
         }
         {
             lv_obj_t *obj = lv_obj_create(parent_obj);
-            objects.obj1 = obj;
+            objects.obj2 = obj;
             lv_obj_set_pos(obj, -1, 46);
             lv_obj_set_size(obj, 241, 165);
             lv_obj_set_scrollbar_mode(obj, LV_SCROLLBAR_MODE_AUTO);

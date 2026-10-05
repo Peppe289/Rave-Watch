@@ -27,9 +27,10 @@ typedef struct _objects_t {
     lv_obj_t *btn_settings_page;
     lv_obj_t *btn_app_drawer_page;
     lv_obj_t *obj0;
+    lv_obj_t *obj1;
     lv_obj_t *brightness_slider;
     lv_obj_t *btn_home_page;
-    lv_obj_t *obj1;
+    lv_obj_t *obj2;
     lv_obj_t *btn_bt_toggle;
     lv_obj_t *img_bt;
     lv_obj_t *btn_home_drawer_page;
