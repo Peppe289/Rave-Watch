@@ -33,6 +33,7 @@
 #include "register_command.h"
 #include <qmi8658c.h>
 #include "tasks.h"
+#include "wifi.h"
 
 static const char *TAG = "main";
 
@@ -128,6 +129,7 @@ void app_main(void)
     storage_nvs_init();
     rtc_init_custom();
     set_handler_suspend_mode(handler_suspend_tasks);
+    //wifi_init_sta();
 
     ESP_ERROR_CHECK(app_lvgl_init());
 
