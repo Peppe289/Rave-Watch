@@ -43,14 +43,6 @@ uint16_t gatt_handle_table[HRS_IDX_NB];
 static const uint16_t GATTS_SERVICE_UUID = 0x00FF;
 static const uint16_t GATTS_CHAR_UUID_STR = 0xFF01;
 
-#define BT_CMD_MAX_ENTRIES 16
-#define BT_CMD_NAME_MAX    16
-
-struct bt_cmd_entry {
-    char name[BT_CMD_NAME_MAX];
-    bt_cmd_handler_t handler;
-};
-
 static struct bt_cmd_entry s_cmd_table[BT_CMD_MAX_ENTRIES];
 static portMUX_TYPE s_cmd_mux = portMUX_INITIALIZER_UNLOCKED;
 

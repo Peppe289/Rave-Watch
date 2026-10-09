@@ -15,11 +15,6 @@ void set_brightness_level(uint8_t level) {
     st7789vw_set_brightness(level);
 }
 
-void action_change_brightness_cb(lv_event_t * e) {
-    set_brightness_level((uint8_t)lv_slider_get_value(
-                            (lv_obj_t *)lv_event_get_target(e)));
-}
-
 void suspend_display() {
     st7789vw_set_brightness(0);
 }

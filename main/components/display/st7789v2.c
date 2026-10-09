@@ -21,6 +21,14 @@ void st7789vw_draw_bitmap(int x_start, int y_start, int x_end, int y_end,
                             color_data);
 }
 
+esp_lcd_panel_handle_t st7789vw_get_panel_handle() {
+  return panel_handle;
+}
+
+esp_lcd_panel_io_handle_t st7789vw_get_panel_io_handle() {
+  return io_handle;
+}
+
 void st7789vw_draw_full_bitmap(const void *color_data) {
   st7789vw_draw_bitmap(0, 0, LCD_H_RES, LCD_V_RES, color_data);
 }
