@@ -4,7 +4,11 @@
 #include "i2cdev.h"
 #include <stdint.h>
 #include "rtc.h"
+#include "esp_netif_sntp.h"
+#include "esp_sntp.h"
+#include "esp_log.h"
 
+static const char *TAG = "RTC";
 static SemaphoreHandle_t s_rtc_sync_sem = NULL;
 
 static i2c_dev_t s_rtc = {
@@ -68,6 +72,54 @@ void rtc_init_custom() {
     gpio_isr_handler_add(RTC_INT_GPIO, intr_handler, NULL);
 }
 
+static uint8_t decToBcd(int val)
+{
+	return (uint8_t)((val / 10 * 16) + (val % 10));
+}
+
+void rtc_sync_ntp() {
+    time_t now;
+    char strftime_buf[64];
+    struct tm timeinfo;
+
+    esp_sntp_config_t config = ESP_NETIF_SNTP_DEFAULT_CONFIG("pool.ntp.org");
+    esp_netif_sntp_init(&config);
+    
+    while(1) {
+        if (esp_netif_sntp_sync_wait(pdMS_TO_TICKS(100000)) != ESP_OK) {
+            ESP_LOGE(TAG, "Failed to update system time within 10s timeout");
+        }
+
+        time(&now);
+        setenv("TZ", "CET-1", 1);
+        tzset();
+
+        localtime_r(&now, &timeinfo);
+        strftime(strftime_buf, sizeof(strftime_buf), "%c", &timeinfo);
+        ESP_LOGI(TAG, "The current legally recognized date/time in italy is: %s", strftime_buf);
+        rtc_date_time_t rtc_time = {
+            .day = timeinfo.tm_mday,
+            .month = timeinfo.tm_mon,
+            .year = timeinfo.tm_year,
+            .hours = timeinfo.tm_hour,
+            .minutes = timeinfo.tm_min,
+            .seconds = timeinfo.tm_sec,
+            .dayweek = timeinfo.tm_wday
+        };
+        uint8_t buf[7] = {
+					  decToBcd(rtc_time.seconds),
+					  decToBcd(rtc_time.minutes),
+					  decToBcd(rtc_time.hours),
+					  decToBcd(rtc_time.day),
+					  decToBcd(rtc_time.dayweek),
+					  decToBcd(rtc_time.month),
+					  decToBcd(rtc_time.year - YEAR_OFFSET)
+        };
+        ESP_ERROR_CHECK(rtc_set_date_time(buf, sizeof(buf)));
+        vTaskDelay(pdMS_TO_TICKS(6000));
+    }
+}
+
 esp_err_t rtc_get_seconds_time(uint8_t *data, size_t len) {
     return i2c_dev_read_reg(&s_rtc, 0x04, data, len);
 }
@@ -78,4 +130,8 @@ esp_err_t rtc_get_minutes_time(uint8_t *data, size_t len) {
 
 esp_err_t rtc_get_hours_time(uint8_t *data, size_t len) {
     return i2c_dev_read_reg(&s_rtc, 0x06, data, len);
+}
+
+esp_err_t rtc_set_date_time(uint8_t *data, size_t len) {
+    return i2c_dev_write_reg(&s_rtc, PCF85063A_RTC_SECOND_ADDR, data, len);
 }

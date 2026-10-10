@@ -121,8 +121,13 @@ static void battery_task(void *arg) {
     }
 }
 
+//static void update(void *arg) {
+//    rtc_sync_ntp();
+//}
 
 void start_background_tasks(void) {
+
+    // xTaskCreatePinnedToCore(update, "ntp", 2048, NULL, 2, NULL, 0);
     xTaskCreatePinnedToCore(clock_update_task, "clock_update_task", 2048, NULL, 2, &battery_task_handle, 0);
     xTaskCreatePinnedToCore(battery_task, "battery_task", 2048, NULL, 2, &battery_task_handle, 0);
     xTaskCreatePinnedToCore(eez_flow_task, "eez_flow_task", 2048, NULL, 3, &eez_flow_task_handle, 1);
