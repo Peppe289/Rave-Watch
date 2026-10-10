@@ -129,19 +129,14 @@ void app_main(void)
     storage_nvs_init();
     rtc_init_custom();
     set_handler_suspend_mode(handler_suspend_tasks);
-    //wifi_init_sta();
+    wifi_init_sta();
 
     ESP_ERROR_CHECK(app_lvgl_init());
 
     battery_adc_init();
     bluedroid_init_ble_gatt();
     struct bt_cmd_entry cmds[] = {
-    //    {"brightness", cmd_brightness},
-    //    {"suspend",    cmd_suspend},
-    //    {"resume",     cmd_resume},
-    //    {"battery",    cmd_battery},
-    //    {"log",        cmd_log},
-    //    {"reboot",     cmd_reboot}
+    //    {"cmd", cmd_data},
     };
     bt_cmds_register(cmds, sizeof(cmds) / sizeof(cmds[0]));
 

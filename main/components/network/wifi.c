@@ -16,33 +16,53 @@
 #include <string.h>
 #include "credential.h"
 
-#include "nvs_flash.h"
-
-#define ESP_MAXIMUM_RETRY 2
-
 static const char *TAG = "WIFI";
 
 static esp_netif_t *netif = NULL;
-
+static bool suspend_wifi = false;
 static esp_event_handler_instance_t instance_any_id;
 static esp_event_handler_instance_t instance_got_ip;
 
 static void event_handler(void *arg, esp_event_base_t event_base,
                           int32_t event_id, void *event_data) {
   if (event_base == WIFI_EVENT && event_id == WIFI_EVENT_STA_START) {
-    //set_wifi_status(WIFI_SYS_STATUS_CONNECTING, true);
-    esp_wifi_connect();
+    if (!suspend_wifi)
+      esp_wifi_connect();
   } else if (event_base == WIFI_EVENT &&
              event_id == WIFI_EVENT_STA_DISCONNECTED) {
-    esp_wifi_connect();
-    //set_wifi_status(WIFI_SYS_STATUS_CONNECTING, false);
-    //set_wifi_status(WIFI_SYS_STATUS_CONNECTED, false);
+    if (!suspend_wifi)
+      esp_wifi_connect();
   } else if (event_base == IP_EVENT && event_id == IP_EVENT_STA_GOT_IP) {
-    // remove connecting status and add connected status.
-    //set_wifi_status(WIFI_SYS_STATUS_CONNECTING, false);
-    //set_wifi_status(WIFI_SYS_STATUS_CONNECTED, true);
-    //mqtt_start_client();
+    ip_event_got_ip_t *event = (ip_event_got_ip_t *)event_data;
+    ESP_LOGI(TAG, "Got IP: " IPSTR "\n", IP2STR(&event->ip_info.ip));
   }
+}
+
+//void wifi_deinit() {
+//  ESP_ERROR_CHECK(esp_event_handler_instance_unregister(
+//      WIFI_EVENT, ESP_EVENT_ANY_ID, instance_any_id));
+//  ESP_ERROR_CHECK(esp_event_handler_instance_unregister(
+//      IP_EVENT, IP_EVENT_STA_GOT_IP, instance_got_ip));
+//  ESP_ERROR_CHECK(esp_wifi_disconnect());
+//  ESP_ERROR_CHECK(esp_wifi_stop());
+//  ESP_ERROR_CHECK(esp_wifi_deinit());
+//}
+
+void wifi_stop() {
+  if (suspend_wifi) {
+    return;
+  }
+  suspend_wifi = true;
+  ESP_ERROR_CHECK(esp_wifi_disconnect());
+  ESP_ERROR_CHECK(esp_wifi_stop());
+}
+
+void wifi_start() {
+  if (!suspend_wifi) {
+    return;
+  }
+  suspend_wifi = false;
+  ESP_ERROR_CHECK(esp_wifi_start());
 }
 
 #ifndef WIFI_SSID
@@ -56,6 +76,7 @@ static void event_handler(void *arg, esp_event_base_t event_base,
 #endif
 
 void wifi_init_sta() {
+  suspend_wifi = false;
   ESP_ERROR_CHECK(esp_netif_init());
   ESP_ERROR_CHECK(esp_event_loop_create_default());
 
@@ -84,7 +105,6 @@ void wifi_init_sta() {
 
   ESP_LOGI(TAG, "Try to connect %s WIFI", wifi_config.sta.ssid);
 
-  //set_wifi_status(WIFI_SYS_STATUS_ENABLED, true);
   ESP_ERROR_CHECK(esp_wifi_set_mode(WIFI_MODE_STA));
   ESP_ERROR_CHECK(esp_wifi_set_config(WIFI_IF_STA, &wifi_config));
   ESP_ERROR_CHECK(esp_wifi_start());

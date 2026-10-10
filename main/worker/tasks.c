@@ -4,6 +4,7 @@
 #include "cst816.h"
 #include "brightness.h"
 #include "battery.h"
+#include "wifi.h"
 
 static TaskHandle_t battery_task_handle = NULL;
 static TaskHandle_t eez_flow_task_handle = NULL;
@@ -72,6 +73,7 @@ static void resume_background_tasks(void) {
     if (eez_flow_task_handle != NULL) {
         vTaskResume(eez_flow_task_handle);
     }
+    wifi_start();
 }
 
 static void resume_display_task(void *arg) {
@@ -96,6 +98,7 @@ static void resume_display_task(void *arg) {
 void handler_suspend_tasks(void *e) {
     freeze_background_tasks();
     suspend_display();
+    wifi_stop();
     if (lvgl_port_lock(0)) {
         lv_indev_enable(touch_indev, false);
         lvgl_port_unlock();

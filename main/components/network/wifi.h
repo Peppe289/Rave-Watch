@@ -9,4 +9,7 @@ void wifi_register_system_handler(void (*wifi_state_handler)(uint32_t bit,
                                                              bool add_bit),
                                   uint32_t (*system_get_state)(void));
 
+void wifi_stop();
+void wifi_start();
+
 #endif // __WIFI_CONN_H__
