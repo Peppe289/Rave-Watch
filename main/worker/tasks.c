@@ -6,6 +6,7 @@
 #include "battery.h"
 #include "wifi.h"
 
+static TaskHandle_t clock_update_task_handle = NULL;
 static TaskHandle_t battery_task_handle = NULL;
 static TaskHandle_t eez_flow_task_handle = NULL;
 static lv_indev_t *touch_indev = NULL;
@@ -58,6 +59,9 @@ static void eez_flow_task(void *arg) {
 
 
 static void freeze_background_tasks(void) {
+    if (clock_update_task_handle != NULL) {
+        vTaskSuspend(clock_update_task_handle);
+    }
     if (battery_task_handle != NULL) {
         vTaskSuspend(battery_task_handle);
     }
@@ -67,6 +71,9 @@ static void freeze_background_tasks(void) {
 }
 
 static void resume_background_tasks(void) {
+    if (clock_update_task_handle != NULL) {
+        vTaskResume(clock_update_task_handle);
+    }
     if (battery_task_handle != NULL) {
         vTaskResume(battery_task_handle);
     }
@@ -128,7 +135,7 @@ static void battery_task(void *arg) {
 void start_background_tasks(void) {
 
     // xTaskCreatePinnedToCore(update, "ntp", 2048, NULL, 2, NULL, 0);
-    xTaskCreatePinnedToCore(clock_update_task, "clock_update_task", 2048, NULL, 2, &battery_task_handle, 0);
+    xTaskCreatePinnedToCore(clock_update_task, "clock_update_task", 2048, NULL, 2, &clock_update_task_handle, 0);
     xTaskCreatePinnedToCore(battery_task, "battery_task", 2048, NULL, 2, &battery_task_handle, 0);
     xTaskCreatePinnedToCore(eez_flow_task, "eez_flow_task", 2048, NULL, 3, &eez_flow_task_handle, 1);
 }
