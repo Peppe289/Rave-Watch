@@ -68,6 +68,7 @@ static void freeze_background_tasks(void) {
     if (eez_flow_task_handle != NULL) {
         vTaskSuspend(eez_flow_task_handle);
     }
+    wifi_stop();
 }
 
 static void resume_background_tasks(void) {
@@ -105,7 +106,6 @@ static void resume_display_task(void *arg) {
 void handler_suspend_tasks(void *e) {
     freeze_background_tasks();
     suspend_display();
-    wifi_stop();
     if (lvgl_port_lock(0)) {
         lv_indev_enable(touch_indev, false);
         lvgl_port_unlock();
