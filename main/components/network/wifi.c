@@ -15,6 +15,7 @@
 #include <stdint.h>
 #include <string.h>
 #include "credential.h"
+#include "wifi.h"
 
 static const char *TAG = "WIFI";
 
@@ -23,18 +24,39 @@ static bool suspend_wifi = false;
 static esp_event_handler_instance_t instance_any_id;
 static esp_event_handler_instance_t instance_got_ip;
 
+static wifi_external_event_handler_t s_wifi_external_event_handler = {
+    .on_wifi_start = NULL,
+    .on_wifi_disconnect = NULL,
+    .on_got_ip = NULL,
+};
+
+void wifi_register_external_handler(wifi_external_event_handler_t *handler) {
+  s_wifi_external_event_handler.on_wifi_start = handler->on_wifi_start;
+  s_wifi_external_event_handler.on_wifi_disconnect = handler->on_wifi_disconnect;
+  s_wifi_external_event_handler.on_got_ip = handler->on_got_ip;
+}
+
 static void event_handler(void *arg, esp_event_base_t event_base,
                           int32_t event_id, void *event_data) {
   if (event_base == WIFI_EVENT && event_id == WIFI_EVENT_STA_START) {
     if (!suspend_wifi)
       esp_wifi_connect();
+    if (s_wifi_external_event_handler.on_wifi_start) {
+      s_wifi_external_event_handler.on_wifi_start();
+    }
   } else if (event_base == WIFI_EVENT &&
              event_id == WIFI_EVENT_STA_DISCONNECTED) {
     if (!suspend_wifi)
       esp_wifi_connect();
+    if (s_wifi_external_event_handler.on_wifi_disconnect) {
+      s_wifi_external_event_handler.on_wifi_disconnect();
+    }
   } else if (event_base == IP_EVENT && event_id == IP_EVENT_STA_GOT_IP) {
     ip_event_got_ip_t *event = (ip_event_got_ip_t *)event_data;
     ESP_LOGI(TAG, "Got IP: " IPSTR "\n", IP2STR(&event->ip_info.ip));
+    if (s_wifi_external_event_handler.on_got_ip) {
+      s_wifi_external_event_handler.on_got_ip();
+    }
   }
 }
 

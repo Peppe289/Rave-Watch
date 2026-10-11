@@ -81,14 +81,14 @@ void rtc_sync_ntp() {
     time_t now;
     char strftime_buf[64];
     struct tm timeinfo;
+    rtc_date_time_t rtc_time;
+    esp_err_t err;
 
-    esp_sntp_config_t config = ESP_NETIF_SNTP_DEFAULT_CONFIG("pool.ntp.org");
+    const esp_sntp_config_t config = ESP_NETIF_SNTP_DEFAULT_CONFIG("pool.ntp.org");
     esp_netif_sntp_init(&config);
     
-    while(1) {
-        if (esp_netif_sntp_sync_wait(pdMS_TO_TICKS(100000)) != ESP_OK) {
-            ESP_LOGE(TAG, "Failed to update system time within 10s timeout");
-        }
+    while(true) {
+        err = esp_netif_sntp_sync_wait(pdMS_TO_TICKS(50000));
 
         time(&now);
         setenv("TZ", "CET-1", 1);
@@ -97,16 +97,16 @@ void rtc_sync_ntp() {
         localtime_r(&now, &timeinfo);
         strftime(strftime_buf, sizeof(strftime_buf), "%c", &timeinfo);
         ESP_LOGI(TAG, "The current legally recognized date/time in italy is: %s", strftime_buf);
-        rtc_date_time_t rtc_time = {
-            .day = timeinfo.tm_mday,
-            .month = timeinfo.tm_mon,
-            .year = timeinfo.tm_year,
-            .hours = timeinfo.tm_hour,
-            .minutes = timeinfo.tm_min,
-            .seconds = timeinfo.tm_sec,
-            .dayweek = timeinfo.tm_wday
-        };
-        uint8_t buf[7] = {
+
+        rtc_time.day = timeinfo.tm_mday;
+        rtc_time.month = timeinfo.tm_mon;
+        rtc_time.year = timeinfo.tm_year;
+        rtc_time.hours = timeinfo.tm_hour;
+        rtc_time.minutes = timeinfo.tm_min;
+        rtc_time.seconds = timeinfo.tm_sec;
+        rtc_time.dayweek = timeinfo.tm_wday;
+
+        const uint8_t buf[7] = {
 					  decToBcd(rtc_time.seconds),
 					  decToBcd(rtc_time.minutes),
 					  decToBcd(rtc_time.hours),
@@ -116,7 +116,11 @@ void rtc_sync_ntp() {
 					  decToBcd(rtc_time.year - YEAR_OFFSET)
         };
         ESP_ERROR_CHECK(rtc_set_date_time(buf, sizeof(buf)));
-        vTaskDelay(pdMS_TO_TICKS(6000));
+
+        if (err == ESP_OK)
+            break;
+
+        vTaskDelay(pdMS_TO_TICKS(1000));
     }
 }
 
@@ -132,6 +136,6 @@ esp_err_t rtc_get_hours_time(uint8_t *data, size_t len) {
     return i2c_dev_read_reg(&s_rtc, 0x06, data, len);
 }
 
-esp_err_t rtc_set_date_time(uint8_t *data, size_t len) {
+esp_err_t rtc_set_date_time(const uint8_t *data, const size_t len) {
     return i2c_dev_write_reg(&s_rtc, PCF85063A_RTC_SECOND_ADDR, data, len);
 }

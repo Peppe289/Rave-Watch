@@ -13,7 +13,7 @@ file(GLOB MAIN_SRCS "main.c" "*.c")
 
 idf_component_register(SRCS ${MAIN_SRCS} ${EXTRA_SRCS}
                        INCLUDE_DIRS "." "worker" "components/network" "components/bt" "components/ui" "components/touch" "components/display" "components/power" "components/rtc/"
-                       PRIV_REQUIRES bt nvs_flash spi_flash esp_lcd esp_timer driver spiffs lvgl esp_driver_ledc esp_adc esp_wifi esp_netif lwip)
+                       PRIV_REQUIRES bt esp_coex nvs_flash spi_flash esp_lcd esp_timer driver spiffs lvgl esp_driver_ledc esp_adc esp_wifi esp_netif lwip)
 
 set_source_files_properties(components/ui/eez-flow.cpp PROPERTIES
     COMPILE_FLAGS "-std=gnu++17"

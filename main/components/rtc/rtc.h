@@ -39,7 +39,7 @@ typedef struct {
 esp_err_t rtc_get_seconds_time(uint8_t *data, size_t len);
 esp_err_t rtc_get_minutes_time(uint8_t *data, size_t len);
 esp_err_t rtc_get_hours_time(uint8_t *data, size_t len);
-esp_err_t rtc_set_date_time(uint8_t *data, size_t len);
+esp_err_t rtc_set_date_time(const uint8_t *data, const size_t len);
 void rtc_init_custom();
 void rtc_sync_ntp();
 SemaphoreHandle_t rtc_get_semaphore();

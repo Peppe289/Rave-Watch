@@ -34,6 +34,8 @@
 #include <qmi8658c.h>
 #include "tasks.h"
 #include "wifi.h"
+#include "esp_coexist.h"
+#include "rtc.h"
 
 static const char *TAG = "main";
 
@@ -119,6 +121,17 @@ static void storage_nvs_init() {
     ESP_ERROR_CHECK(ret);
 }
 
+static void wifi_status_start(void) {
+    ESP_ERROR_CHECK(esp_coex_preference_set(ESP_COEX_PREFER_WIFI));
+}
+
+static void wifi_status_got_ip(void) {
+    ESP_LOGI(TAG, "WiFi connected, got IP address");
+    ESP_ERROR_CHECK(esp_coex_preference_set(ESP_COEX_PREFER_BALANCE));
+    rtc_sync_ntp();
+    ESP_LOGI(TAG, "RTC synchronized with NTP server");
+}
+
 void app_main(void)
 {
     board_power_latch();
@@ -129,6 +142,12 @@ void app_main(void)
     storage_nvs_init();
     rtc_init_custom();
     set_handler_suspend_mode(handler_suspend_tasks);
+    wifi_external_event_handler_t handler = {
+        .on_wifi_start = wifi_status_start,
+        .on_wifi_disconnect = wifi_status_start,
+        .on_got_ip = wifi_status_got_ip,
+    };
+    wifi_register_external_handler(&handler);
     wifi_init_sta();
 
     ESP_ERROR_CHECK(app_lvgl_init());

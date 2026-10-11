@@ -4,10 +4,14 @@
 #include <stdbool.h>
 #include <stdint.h>
 
+typedef struct wifi_external_event_handler_t {
+  void (*on_wifi_start)(void);
+  void (*on_wifi_disconnect)(void);
+  void (*on_got_ip)(void);
+} wifi_external_event_handler_t;
+
 void wifi_init_sta(void);
-void wifi_register_system_handler(void (*wifi_state_handler)(uint32_t bit,
-                                                             bool add_bit),
-                                  uint32_t (*system_get_state)(void));
+void wifi_register_external_handler(wifi_external_event_handler_t *handler);
 
 void wifi_stop();
 void wifi_start();
