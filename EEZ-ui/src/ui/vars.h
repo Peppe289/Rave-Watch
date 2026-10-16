@@ -22,6 +22,12 @@ extern const char *get_var_digital_clock();
 extern void set_var_digital_clock(const char *value);
 extern const char *get_var_digital_clock_seconds();
 extern void set_var_digital_clock_seconds(const char *value);
+extern int32_t get_var_rssi_value();
+extern void set_var_rssi_value(int32_t value);
+extern bool get_var_rssi_enabled();
+extern void set_var_rssi_enabled(bool value);
+extern bool get_var_bt_connected();
+extern void set_var_bt_connected(bool value);
 
 #ifdef __cplusplus
 }

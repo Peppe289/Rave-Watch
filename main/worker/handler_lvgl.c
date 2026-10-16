@@ -3,6 +3,7 @@
 #include "vars.h"
 
 #include "brightness.h"
+#include "esp_log.h"
 
 void (*handler_suspend_mode)(void *e) = NULL;
 
@@ -10,6 +11,9 @@ void (*handler_suspend_mode)(void *e) = NULL;
 
 char digital_clock_seconds[100] = { 0 };
 char digital_clock[100] = { 0 };
+int32_t rssi_value = 0;
+bool rssi_enabled = false;
+bool bt_connected = false;
 
 const char *get_var_digital_clock() {
     return digital_clock;
@@ -47,4 +51,34 @@ void action_start_suspend_mode(lv_event_t *e) {
     if (handler_suspend_mode) {
         handler_suspend_mode(e);
     }
+}
+
+// ------------ RSSI Bar ------------
+
+int32_t get_var_rssi_value() {
+    return rssi_value;
+}
+
+void set_var_rssi_value(int32_t value) {
+    rssi_value = ((float)value + 127) / (127 + 20) * 100;
+}
+
+// ------------ RSSI toggle ------------
+
+bool get_var_rssi_enabled() {
+    return rssi_enabled;
+}
+
+void set_var_rssi_enabled(bool value) {
+    rssi_enabled = value;
+}
+
+// ------------ BT enabled ref ------------
+ 
+bool get_var_bt_connected() {
+    return bt_connected;
+}
+
+void set_var_bt_connected(bool value) {
+    bt_connected = value;
 }

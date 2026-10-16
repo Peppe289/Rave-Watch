@@ -1,7 +1,10 @@
 #include "esp_bt.h"
+#include "esp_bt_defs.h"
 #include "esp_log.h"
 #include "esp_system.h"
 #include "freertos/FreeRTOS.h"
+#include "freertos/idf_additions.h"
+#include "freertos/projdefs.h"
 #include "freertos/task.h"
 #include "freertos/queue.h"
 
@@ -16,6 +19,7 @@
 #include "screens.h"
 #include "images.h"
 #include "widgets/lv_img.h"
+#include "vars.h"
 
 #include "bt.h"
 
@@ -39,6 +43,7 @@ enum {
 };
 
 uint16_t gatt_handle_table[HRS_IDX_NB];
+static esp_bd_addr_t device_addr = {0};
 
 static const uint16_t GATTS_SERVICE_UUID = 0x00FF;
 static const uint16_t GATTS_CHAR_UUID_STR = 0xFF01;
@@ -62,6 +67,10 @@ static bool s_bt_toggling = false;
 
 static void bt_stack_disable(void) {
     uint8_t inst = 0;
+    
+    set_var_bt_connected(false);
+    set_var_rssi_enabled(false);
+    set_var_rssi_value(0);
     esp_ble_gap_ext_adv_stop(1, &inst);
     vTaskDelay(pdMS_TO_TICKS(100));
 
@@ -127,6 +136,18 @@ void action_toggle_bt(lv_event_t *e) {
     }
     *param = s_bt_enabled;
     xTaskCreatePinnedToCore(bt_toggle_task, "bt_toggle", 4096, param, 3, NULL, 0);
+}
+
+static void bt_gap_rssi_report_task(void *arg) {
+    const esp_bd_addr_t null_addr = { 0 };
+    for (;;) {
+        if (!get_var_rssi_enabled()) continue;
+
+        if (memcmp(&device_addr, &null_addr, sizeof(device_addr)))
+            esp_ble_gap_read_rssi(device_addr);
+
+        vTaskDelay(pdMS_TO_TICKS(1000));
+    }
 }
 
 static void bt_cmd_dispatch_task(void *arg) {
@@ -301,6 +322,12 @@ static void gap_event_handler(esp_gap_ble_cb_event_t event, esp_ble_gap_cb_param
         case ESP_GAP_BLE_EXT_ADV_START_COMPLETE_EVT:
             ESP_LOGI(GATTS_TABLE_TAG, "Advertising BLE 5.0 started!");
             break;
+        case ESP_GAP_BLE_READ_RSSI_COMPLETE_EVT:
+            struct ble_read_rssi_cmpl_evt_param rssi_evt = param->read_rssi_cmpl;
+            if (ESP_BT_STATUS_SUCCESS == rssi_evt.status)
+                set_var_rssi_value((int32_t)rssi_evt.rssi);
+
+            break;
         default:
             break;
     }
@@ -324,6 +351,8 @@ static void gatts_profile_event_handler(esp_gatts_cb_event_t event, esp_gatt_if_
 
         case ESP_GATTS_CONNECT_EVT:
             ESP_LOGI(GATTS_TABLE_TAG, "Device connected (conn_id = %d)", param->connect.conn_id);
+            set_var_bt_connected(true);
+            memcpy(device_addr, param->connect.remote_bda, sizeof(param->connect.remote_bda));
             break;
 
         case ESP_GATTS_DISCONNECT_EVT:
@@ -334,6 +363,8 @@ static void gatts_profile_event_handler(esp_gatts_cb_event_t event, esp_gatt_if_
                 [0] = { .instance = 0, .duration = 0, .max_events = 0 }
             };
             esp_ble_gap_ext_adv_start(1, ext_adv);
+            set_var_bt_connected(false);
+            set_var_rssi_value(0);
             break;
 
         case ESP_GATTS_CREAT_ATTR_TAB_EVT:
@@ -377,4 +408,5 @@ void bluedroid_init_ble_gatt(void) {
 
     s_cmd_queue = xQueueCreate(BT_CMD_QUEUE_LEN, sizeof(bt_cmd_msg_t));
     xTaskCreatePinnedToCore(bt_cmd_dispatch_task, "bt_cmd", 6144, NULL, 5, NULL, 1);
+    xTaskCreatePinnedToCore(bt_gap_rssi_report_task, "rssi_ping", 2048, NULL, 0, NULL, 1);
 }
