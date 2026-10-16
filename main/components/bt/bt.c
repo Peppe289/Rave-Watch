@@ -141,7 +141,7 @@ void action_toggle_bt(lv_event_t *e) {
 static void bt_gap_rssi_report_task(void *arg) {
     const esp_bd_addr_t null_addr = { 0 };
     for (;;) {
-        if (!get_var_rssi_enabled()) continue;
+        if (!get_var_rssi_enabled() || !get_var_bt_connected()) continue;
 
         if (memcmp(&device_addr, &null_addr, sizeof(device_addr)))
             esp_ble_gap_read_rssi(device_addr);
