@@ -14,6 +14,7 @@ char digital_clock[100] = { 0 };
 int32_t rssi_value = 0;
 bool rssi_enabled = false;
 bool bt_connected = false;
+char bt_status[100] = { 0 };
 
 const char *get_var_digital_clock() {
     return digital_clock;
@@ -81,4 +82,15 @@ bool get_var_bt_connected() {
 
 void set_var_bt_connected(bool value) {
     bt_connected = value;
+}
+
+// ------------ BT Status -----------------
+
+const char *get_var_bt_status() {
+    return bt_status;
+}
+
+void set_var_bt_status(const char *value) {
+    strncpy(bt_status, value, sizeof(bt_status) / sizeof(char));
+    bt_status[sizeof(bt_status) / sizeof(char) - 1] = 0;
 }

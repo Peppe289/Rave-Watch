@@ -1,5 +1,6 @@
 #include "esp_bt.h"
 #include "esp_bt_defs.h"
+#include "esp_err.h"
 #include "esp_log.h"
 #include "esp_system.h"
 #include "freertos/FreeRTOS.h"
@@ -34,6 +35,8 @@
 
 #define GATTS_MAX_CHAR_LEN 512
 #define CHAR_DECLARATION_SIZE (sizeof(uint8_t))
+
+#define PASSKEY_LENGHT 8
 
 enum {
     IDX_SVC,
@@ -81,6 +84,7 @@ static void bt_stack_disable(void) {
         ESP_LOGE(GATTS_TABLE_TAG, "esp_bt_controller_disable() failled");
     }
     ESP_LOGI(GATTS_TABLE_TAG, "Bluetooth disabled");
+    set_var_bt_status("Disabled");
 }
 
 static void bt_stack_enable(void) {
@@ -99,6 +103,7 @@ static void bt_stack_enable(void) {
     esp_ble_gatt_set_local_mtu(512);
 
     ESP_LOGI(GATTS_TABLE_TAG, "Bluetooth restarted");
+    set_var_bt_status("Started");
 }
 
 static void bt_toggle_task(void *arg) {
@@ -308,10 +313,24 @@ static const esp_gatts_attr_db_t gatt_db[HRS_IDX_NB] = {
 
 static void gap_event_handler(esp_gap_ble_cb_event_t event, esp_ble_gap_cb_param_t *param) {
     switch (event) {
+        case ESP_GAP_BLE_PASSKEY_NOTIF_EVT:    
+            ESP_LOGI(GATTS_TABLE_TAG, "The passkey Notify number:%d", param->ble_security.key_notif.passkey);
+            //memcpy(&passkey, &(param->ble_security.key_notif.passkey), sizeof(uint32_t));
+            char passkey_str[sizeof("PASSKEY: ") + PASSKEY_LENGHT];
+            sprintf(passkey_str, "PASSKEY: %lu", param->ble_security.key_notif.passkey);
+            set_var_bt_status(passkey_str);
+            break;
         case ESP_GAP_BLE_EXT_ADV_SET_PARAMS_COMPLETE_EVT:
             esp_ble_gap_config_ext_adv_data_raw(0, sizeof(ext_adv_raw_data), ext_adv_raw_data);
             break;
 
+        case ESP_GAP_BLE_AUTH_CMPL_EVT:
+            if (param->ble_security.auth_cmpl.success) {
+                set_var_bt_status("Connected!");
+            } else {
+                set_var_bt_status("Failed!");
+            }
+            break;
         case ESP_GAP_BLE_EXT_ADV_DATA_SET_COMPLETE_EVT: {
             esp_ble_gap_ext_adv_t ext_adv[1] = {
                 [0] = { .instance = 0, .duration = 0, .max_events = 0 }
@@ -321,6 +340,7 @@ static void gap_event_handler(esp_gap_ble_cb_event_t event, esp_ble_gap_cb_param
         }
         case ESP_GAP_BLE_EXT_ADV_START_COMPLETE_EVT:
             ESP_LOGI(GATTS_TABLE_TAG, "Advertising BLE 5.0 started!");
+            set_var_bt_status("BLE Started!");
             break;
         case ESP_GAP_BLE_READ_RSSI_COMPLETE_EVT:
             struct ble_read_rssi_cmpl_evt_param rssi_evt = param->read_rssi_cmpl;
@@ -351,13 +371,20 @@ static void gatts_profile_event_handler(esp_gatts_cb_event_t event, esp_gatt_if_
 
         case ESP_GATTS_CONNECT_EVT:
             ESP_LOGI(GATTS_TABLE_TAG, "Device connected (conn_id = %d)", param->connect.conn_id);
-            set_var_bt_connected(true);
-            memcpy(device_addr, param->connect.remote_bda, sizeof(param->connect.remote_bda));
+            uint8_t inst = 0;
+            esp_ble_gap_ext_adv_stop(1, &inst);
+            if (esp_ble_set_encryption(param->connect.remote_bda, ESP_BLE_SEC_ENCRYPT_MITM) == ESP_OK) {
+                set_var_bt_connected(true);
+                memcpy(device_addr, param->connect.remote_bda, sizeof(param->connect.remote_bda));
+                set_var_bt_status("Set Up Key!");
+            }
             break;
 
         case ESP_GATTS_DISCONNECT_EVT:
             if (!s_bt_enabled) break;
             ESP_LOGI(GATTS_TABLE_TAG, "Device disconnected, restart advertising...");
+            set_var_bt_status("Disconnected!");
+            memset(device_addr, 0, sizeof(device_addr));
             /* Riavvia l'istanza 0 */
             esp_ble_gap_ext_adv_t ext_adv[1] = {
                 [0] = { .instance = 0, .duration = 0, .max_events = 0 }
@@ -391,6 +418,13 @@ static void gatts_event_handler(esp_gatts_cb_event_t event, esp_gatt_if_t gatts_
 }
 
 void bluedroid_init_ble_gatt(void) {
+    esp_ble_io_cap_t iocap = ESP_IO_CAP_OUT;
+    esp_ble_auth_req_t auth_req = ESP_LE_AUTH_REQ_SC_MITM_BOND;
+    uint8_t key_size = PASSKEY_LENGHT;
+    uint8_t init_key = ESP_BLE_ENC_KEY_MASK | ESP_BLE_ID_KEY_MASK;
+    uint8_t rsp_key = ESP_BLE_ENC_KEY_MASK | ESP_BLE_ID_KEY_MASK;
+
+
     ESP_ERROR_CHECK(esp_bt_controller_mem_release(ESP_BT_MODE_CLASSIC_BT));
     esp_bt_controller_config_t bt_cfg = BT_CONTROLLER_INIT_CONFIG_DEFAULT();
     ESP_ERROR_CHECK(esp_bt_controller_init(&bt_cfg));
@@ -401,6 +435,13 @@ void bluedroid_init_ble_gatt(void) {
     ESP_ERROR_CHECK(esp_bluedroid_enable());
 
     ESP_ERROR_CHECK(esp_ble_gatts_register_callback(gatts_event_handler));
+    
+    ESP_ERROR_CHECK(esp_ble_gap_set_security_param(ESP_BLE_SM_AUTHEN_REQ_MODE, &auth_req, sizeof(uint8_t)));
+    ESP_ERROR_CHECK(esp_ble_gap_set_security_param(ESP_BLE_SM_IOCAP_MODE, &iocap, sizeof(uint8_t)));
+    ESP_ERROR_CHECK(esp_ble_gap_set_security_param(ESP_BLE_SM_MAX_KEY_SIZE, &key_size, sizeof(uint8_t)));
+    ESP_ERROR_CHECK(esp_ble_gap_set_security_param(ESP_BLE_SM_SET_INIT_KEY, &init_key, sizeof(uint8_t)));
+    ESP_ERROR_CHECK(esp_ble_gap_set_security_param(ESP_BLE_SM_SET_RSP_KEY, &rsp_key, sizeof(uint8_t)));
+
     ESP_ERROR_CHECK(esp_ble_gap_register_callback(gap_event_handler));
     ESP_ERROR_CHECK(esp_ble_gatts_app_register(ESP_APP_ID));
 

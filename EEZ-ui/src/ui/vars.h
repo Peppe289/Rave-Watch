@@ -28,6 +28,8 @@ extern bool get_var_rssi_enabled();
 extern void set_var_rssi_enabled(bool value);
 extern bool get_var_bt_connected();
 extern void set_var_bt_connected(bool value);
+extern const char *get_var_bt_status();
+extern void set_var_bt_status(const char *value);
 
 #ifdef __cplusplus
 }

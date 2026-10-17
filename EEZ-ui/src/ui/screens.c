@@ -13,7 +13,7 @@
 objects_t objects;
 
 static const char *screen_names[] = { "Main", "SettingsPage", "DrawerPage" };
-static const char *object_names[] = { "main", "settings_page", "drawer_page", "btn_suspend", "container_battery_voltage", "battery_status", "btn_settings_page", "btn_app_drawer_page", "obj0", "obj1", "brightness_slider", "btn_home_page", "bt_feature_box", "rssi_report_bar", "bt_follow_rssi", "btn_bt_toggle", "img_bt", "btn_home_drawer_page" };
+static const char *object_names[] = { "main", "settings_page", "drawer_page", "btn_suspend", "container_battery_voltage", "battery_status", "btn_settings_page", "btn_app_drawer_page", "obj0", "obj1", "brightness_slider", "btn_home_page", "bt_feature_box", "bt_status", "rssi_report_bar", "bt_follow_rssi", "btn_bt_toggle", "img_bt", "btn_home_drawer_page" };
 
 //
 // Event handlers
@@ -104,6 +104,20 @@ static void event_handler_cb_settings_page_btn_home_page(lv_event_t *e) {
     }
 }
 
+static void event_handler_cb_settings_page_bt_status(lv_event_t *e) {
+    lv_event_code_t event = lv_event_get_code(e);
+    void *flowState = lv_event_get_user_data(e);
+    (void)flowState;
+    
+    if (event == LV_EVENT_VALUE_CHANGED) {
+        lv_obj_t *ta = lv_event_get_target(e);
+        if (tick_value_change_obj != ta) {
+            const char *value = lv_textarea_get_text(ta);
+            assignStringProperty(flowState, 6, 3, value, "Failed to assign Text in Textarea widget");
+        }
+    }
+}
+
 static void event_handler_cb_settings_page_bt_follow_rssi(lv_event_t *e) {
     lv_event_code_t event = lv_event_get_code(e);
     void *flowState = lv_event_get_user_data(e);
@@ -113,7 +127,7 @@ static void event_handler_cb_settings_page_bt_follow_rssi(lv_event_t *e) {
         lv_obj_t *ta = lv_event_get_target(e);
         if (tick_value_change_obj != ta) {
             bool value = lv_obj_has_state(ta, LV_STATE_CHECKED);
-            assignBooleanProperty(flowState, 7, 3, value, "Failed to assign Checked state");
+            assignBooleanProperty(flowState, 8, 3, value, "Failed to assign Checked state");
         }
     }
 }
@@ -396,7 +410,7 @@ void create_screen_settings_page() {
             lv_obj_t *obj = lv_obj_create(parent_obj);
             objects.bt_feature_box = obj;
             lv_obj_set_pos(obj, 10, 43);
-            lv_obj_set_size(obj, 221, 79);
+            lv_obj_set_size(obj, 221, 110);
             lv_obj_set_style_pad_left(obj, 0, LV_PART_MAIN | LV_STATE_DEFAULT);
             lv_obj_set_style_pad_top(obj, 0, LV_PART_MAIN | LV_STATE_DEFAULT);
             lv_obj_set_style_pad_right(obj, 0, LV_PART_MAIN | LV_STATE_DEFAULT);
@@ -406,6 +420,25 @@ void create_screen_settings_page() {
             lv_obj_set_style_radius(obj, 0, LV_PART_MAIN | LV_STATE_DEFAULT);
             {
                 lv_obj_t *parent_obj = obj;
+                {
+                    // bt_status
+                    lv_obj_t *obj = lv_textarea_create(parent_obj);
+                    objects.bt_status = obj;
+                    lv_obj_set_pos(obj, 71, 36);
+                    lv_obj_set_size(obj, 92, 39);
+                    lv_textarea_set_max_length(obj, 128);
+                    lv_textarea_set_one_line(obj, false);
+                    lv_textarea_set_password_mode(obj, false);
+                    lv_obj_add_event_cb(obj, event_handler_cb_settings_page_bt_status, LV_EVENT_ALL, flowState);
+                    add_style_clock_style(obj);
+                    lv_obj_set_style_text_font(obj, &lv_font_montserrat_14, LV_PART_MAIN | LV_STATE_DEFAULT);
+                    lv_obj_set_style_pad_top(obj, 0, LV_PART_MAIN | LV_STATE_DEFAULT);
+                    lv_obj_set_style_pad_bottom(obj, 0, LV_PART_MAIN | LV_STATE_DEFAULT);
+                    lv_obj_set_style_pad_left(obj, 0, LV_PART_MAIN | LV_STATE_DEFAULT);
+                    lv_obj_set_style_pad_right(obj, 0, LV_PART_MAIN | LV_STATE_DEFAULT);
+                    lv_obj_set_style_pad_row(obj, 0, LV_PART_MAIN | LV_STATE_DEFAULT);
+                    lv_obj_set_style_pad_column(obj, 0, LV_PART_MAIN | LV_STATE_DEFAULT);
+                }
                 {
                     // rssi_report_bar
                     lv_obj_t *obj = lv_bar_create(parent_obj);
@@ -417,7 +450,7 @@ void create_screen_settings_page() {
                     // bt_follow_rssi
                     lv_obj_t *obj = lv_switch_create(parent_obj);
                     objects.bt_follow_rssi = obj;
-                    lv_obj_set_pos(obj, 117, 39);
+                    lv_obj_set_pos(obj, 163, 43);
                     lv_obj_set_size(obj, 48, 25);
                     lv_obj_add_event_cb(obj, event_handler_cb_settings_page_bt_follow_rssi, LV_EVENT_ALL, flowState);
                 }
@@ -459,7 +492,17 @@ void tick_screen_settings_page() {
     void *flowState = getFlowState(0, 1);
     (void)flowState;
     {
-        int32_t new_val = evalIntegerProperty(flowState, 6, 3, "Failed to evaluate Value in Bar widget");
+        const char *new_val = evalTextProperty(flowState, 6, 3, "Failed to evaluate Text in Textarea widget");
+        const char *cur_val = lv_textarea_get_text(objects.bt_status);
+        uint32_t max_length = lv_textarea_get_max_length(objects.bt_status);
+        if (strncmp(new_val, cur_val, max_length) != 0) {
+            tick_value_change_obj = objects.bt_status;
+            lv_textarea_set_text(objects.bt_status, new_val);
+            tick_value_change_obj = NULL;
+        }
+    }
+    {
+        int32_t new_val = evalIntegerProperty(flowState, 7, 3, "Failed to evaluate Value in Bar widget");
         int32_t cur_val = lv_bar_get_value(objects.rssi_report_bar);
         if (new_val != cur_val) {
             tick_value_change_obj = objects.rssi_report_bar;
@@ -468,7 +511,7 @@ void tick_screen_settings_page() {
         }
     }
     {
-        bool new_val = evalBooleanProperty(flowState, 7, 3, "Failed to evaluate Checked state");
+        bool new_val = evalBooleanProperty(flowState, 8, 3, "Failed to evaluate Checked state");
         bool cur_val = lv_obj_has_state(objects.bt_follow_rssi, LV_STATE_CHECKED);
         if (new_val != cur_val) {
             tick_value_change_obj = objects.bt_follow_rssi;
@@ -481,7 +524,7 @@ void tick_screen_settings_page() {
         }
     }
     {
-        bool new_val = evalBooleanProperty(flowState, 7, 4, "Failed to evaluate Disabled state");
+        bool new_val = evalBooleanProperty(flowState, 8, 4, "Failed to evaluate Disabled state");
         bool cur_val = lv_obj_has_state(objects.bt_follow_rssi, LV_STATE_DISABLED);
         if (new_val != cur_val) {
             tick_value_change_obj = objects.bt_follow_rssi;
