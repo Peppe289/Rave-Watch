@@ -1,20 +1,22 @@
 #include "tasks.h"
+#include "esp_event_base.h"
+#include "esp_log.h"
 #include "rtc.h"
 #include "handler_lvgl.h"
 #include "cst816.h"
 #include "brightness.h"
 #include "battery.h"
 #include "wifi.h"
+#include "freertos/task.h"
+#include "freertos/semphr.h"
+#include "esp_event.h"
+#include <stdio.h>
 
 static TaskHandle_t clock_update_task_handle = NULL;
 static TaskHandle_t battery_task_handle = NULL;
 static TaskHandle_t eez_flow_task_handle = NULL;
 static lv_indev_t *touch_indev = NULL;
 static bool s_suspend_display = false;
-
-void set_touch_indev(lv_indev_t *indev) {
-    touch_indev = indev;
-}
 
 static void clock_update_task(void *arg) {
     while (1) {
@@ -46,7 +48,6 @@ static void clock_update_task(void *arg) {
     }
 }
 
-
 static void eez_flow_task(void *arg) {
     while (1) {
         if (lvgl_port_lock(0)) {
@@ -56,7 +57,6 @@ static void eez_flow_task(void *arg) {
         vTaskDelay(pdMS_TO_TICKS(5));
     }
 }
-
 
 static void freeze_background_tasks(void) {
     if (clock_update_task_handle != NULL) {
@@ -103,16 +103,6 @@ static void resume_display_task(void *arg) {
     }
 }
 
-void handler_suspend_tasks(void *e) {
-    freeze_background_tasks();
-    suspend_display();
-    if (lvgl_port_lock(0)) {
-        lv_indev_enable(touch_indev, false);
-        lvgl_port_unlock();
-    }
-    xTaskCreatePinnedToCore(resume_display_task, "resume_display_task", 2048, NULL, 5, NULL, 1);   
-}
-
 static void battery_task(void *arg) {
     static uint32_t voltage_mv;
     while (1) {
@@ -128,9 +118,62 @@ static void battery_task(void *arg) {
     }
 }
 
-void start_background_tasks(void) {
+const static frtos_task_attr_t s_task_attr[] = {
+    [0] = {
+        .pxTaskCode = clock_update_task,
+        .pcName = "clock_update_task",
+        .usStackDepth = 2048,
+        .pvParameters = NULL,
+        .uxPriority = 2,
+        .pxCreatedTask = &clock_update_task_handle,
+        .xCoreID = 0,
+    },
+    [1] = {
+        .pxTaskCode = battery_task,
+        .pcName = "battery_task",
+        .usStackDepth = 2048,
+        .pvParameters = NULL,
+        .uxPriority = 2,
+        .pxCreatedTask = &battery_task_handle,
+        .xCoreID = 0,
+    },
+    [2] = {
+        .pxTaskCode = eez_flow_task,
+        .pcName = "eez_flow_task",
+        .usStackDepth = 2048,
+        .pvParameters = NULL,
+        .uxPriority = 3,
+        .pxCreatedTask = &eez_flow_task_handle,
+        .xCoreID = 1,
+    }
+};
 
-    xTaskCreatePinnedToCore(clock_update_task, "clock_update_task", 2048, NULL, 2, &clock_update_task_handle, 0);
-    xTaskCreatePinnedToCore(battery_task, "battery_task", 2048, NULL, 2, &battery_task_handle, 0);
-    xTaskCreatePinnedToCore(eez_flow_task, "eez_flow_task", 2048, NULL, 3, &eez_flow_task_handle, 1);
+const static ssize_t task_attr_size = sizeof(s_task_attr) / sizeof(frtos_task_attr_t);
+
+void start_background_tasks(void) {
+    ssize_t n_task;
+
+    for (n_task = 0; n_task < task_attr_size; n_task++) {
+        xTaskCreatePinnedToCore(s_task_attr[n_task].pxTaskCode, 
+            s_task_attr[n_task].pcName,
+            s_task_attr[n_task].usStackDepth, 
+            s_task_attr[n_task].pvParameters,
+            s_task_attr[n_task].uxPriority,
+            s_task_attr[n_task].pxCreatedTask,
+            s_task_attr[n_task].xCoreID);
+    }
+}
+
+void set_touch_indev(lv_indev_t *indev) {
+    touch_indev = indev;
+}
+
+void handler_suspend_tasks(void *e) {
+    freeze_background_tasks();
+    suspend_display();
+    if (lvgl_port_lock(0)) {
+        lv_indev_enable(touch_indev, false);
+        lvgl_port_unlock();
+    }
+    xTaskCreatePinnedToCore(resume_display_task, "resume_display_task", 2048, NULL, 5, NULL, 1);   
 }
