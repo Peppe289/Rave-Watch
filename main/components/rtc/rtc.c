@@ -78,6 +78,7 @@ static uint8_t decToBcd(int val)
 }
 
 void rtc_sync_ntp() {
+    int retry = 5;
     time_t now;
     char strftime_buf[64];
     struct tm timeinfo;
@@ -87,7 +88,7 @@ void rtc_sync_ntp() {
     const esp_sntp_config_t config = ESP_NETIF_SNTP_DEFAULT_CONFIG("pool.ntp.org");
     esp_netif_sntp_init(&config);
     
-    while(true) {
+    while(retry--) {
         err = esp_netif_sntp_sync_wait(pdMS_TO_TICKS(50000));
 
         time(&now);
