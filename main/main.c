@@ -164,5 +164,6 @@ void app_main(void)
         lvgl_port_unlock();
     }
 
+    esp_log_level_set("wifi", ESP_LOG_WARN);
     start_background_tasks();
 }
